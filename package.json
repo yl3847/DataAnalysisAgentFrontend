@@ -1,6 +1,7 @@
 {
   "name": "data-analytics-chatbot-frontend",
   "version": "0.1.0",
+  "homepage": "https://yl3847.github.io/DataAnalysisAgentFrontend",
   "private": true,
   "dependencies": {
     "@ant-design/charts": "^2.0.0",
@@ -15,6 +16,8 @@
     "web-vitals": "^2.1.4"
   },
   "scripts": {
+    "predeploy": "npm run build",
+    "deploy": "gh-pages -d build",
     "start": "react-scripts start",
     "build": "react-scripts build",
     "test": "react-scripts test",
@@ -42,7 +45,7 @@
   },
   "devDependencies": {
     "autoprefixer": "^10.4.16",
-    "gh-pages": "^6.0.0",
+    "gh-pages": "^6.3.0",
     "postcss": "^8.4.32",
     "react-scripts": "^5.0.1",
     "tailwindcss": "^3.3.6"
