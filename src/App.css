@@ -1,0 +1,79 @@
+.App {
+  text-align: left;
+  height: 100vh;
+  overflow: hidden;
+}
+
+/* Main layout adjustments */
+.main-layout {
+  height: 100vh;
+  display: flex;
+  flex-direction: column;
+}
+
+.main-layout main {
+  flex: 1;
+  overflow: hidden;
+}
+
+/* Scrollbar styles for analysis area */
+.analysis-scroll-area {
+  overflow-y: auto !important;
+  height: 100%;
+  scrollbar-width: thin;
+  scrollbar-color: #cbd5e0 #f7fafc;
+}
+
+.analysis-scroll-area::-webkit-scrollbar {
+  width: 8px;
+}
+
+.analysis-scroll-area::-webkit-scrollbar-track {
+  background: #f7fafc;
+  border-radius: 4px;
+}
+
+.analysis-scroll-area::-webkit-scrollbar-thumb {
+  background: #cbd5e0;
+  border-radius: 4px;
+}
+
+.analysis-scroll-area::-webkit-scrollbar-thumb:hover {
+  background: #9ca3af;
+}
+
+/* Chat scrollbar styles */
+.chat-messages-area {
+  overflow-y: auto !important;
+  scrollbar-width: thin;
+  scrollbar-color: #cbd5e0 #f7fafc;
+}
+
+.chat-messages-area::-webkit-scrollbar {
+  width: 6px;
+}
+
+.chat-messages-area::-webkit-scrollbar-track {
+  background: #f7fafc;
+  border-radius: 3px;
+}
+
+.chat-messages-area::-webkit-scrollbar-thumb {
+  background: #cbd5e0;
+  border-radius: 3px;
+}
+
+.chat-messages-area::-webkit-scrollbar-thumb:hover {
+  background: #9ca3af;
+}
+
+/* Highlight animation */
+@keyframes highlightPulse {
+  0% { background-color: rgba(59, 130, 246, 0.1); }
+  50% { background-color: rgba(59, 130, 246, 0.2); }
+  100% { background-color: rgba(59, 130, 246, 0.1); }
+}
+
+.highlight-analysis {
+  animation: highlightPulse 2s ease-in-out;
+}

@@ -1,0 +1,136 @@
+/* Response Display Styles */
+.response-display {
+  height: 100%;
+  display: flex;
+  flex-direction: column;
+}
+
+.response-display-empty {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  min-height: 200px;
+  background: #f9fafb;
+  border-radius: 0.5rem;
+  border: 1px dashed #e5e7eb;
+}
+
+.response-content {
+  flex: 1;
+  overflow-y: auto;
+  padding-right: 0.5rem;
+}
+
+/* Chart Container */
+.chart-container-wrapper {
+  background: white;
+  border: 1px solid #e5e7eb;
+  border-radius: 0.5rem;
+  padding: 1rem;
+  transition: box-shadow 0.2s ease;
+}
+
+.chart-container-wrapper:hover {
+  box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1);
+}
+
+/* Prose Overrides for Markdown */
+.response-display .prose {
+  color: #374151;
+  max-width: none;
+}
+
+.response-display .prose h1,
+.response-display .prose h2,
+.response-display .prose h3 {
+  color: #111827;
+  font-weight: 600;
+}
+
+.response-display .prose a {
+  color: #2563eb;
+  text-decoration: underline;
+}
+
+.response-display .prose a:hover {
+  color: #1d4ed8;
+}
+
+.response-display .prose code {
+  background-color: #f3f4f6;
+  padding: 0.125rem 0.375rem;
+  border-radius: 0.25rem;
+  font-size: 0.875rem;
+  font-weight: 500;
+}
+
+.response-display .prose pre {
+  background-color: #1f2937;
+  color: #f3f4f6;
+  overflow-x: auto;
+  padding: 1rem;
+  border-radius: 0.5rem;
+  margin: 1rem 0;
+}
+
+.response-display .prose pre code {
+  background-color: transparent;
+  padding: 0;
+  color: inherit;
+  font-weight: normal;
+}
+
+/* Tab badges */
+.response-display button span.rounded-full {
+  animation: pulse 2s cubic-bezier(0.4, 0, 0.6, 1) infinite;
+}
+
+@keyframes pulse {
+  0%, 100% {
+    opacity: 1;
+  }
+  50% {
+    opacity: 0.7;
+  }
+}
+
+/* Export buttons hover effect */
+.response-display button:hover {
+  transform: translateY(-1px);
+}
+
+/* Loading skeleton for charts */
+.chart-loading {
+  background: linear-gradient(
+    90deg,
+    #f0f0f0 25%,
+    #f8f8f8 50%,
+    #f0f0f0 75%
+  );
+  background-size: 200% 100%;
+  animation: loading 1.5s infinite;
+  height: 300px;
+  border-radius: 0.5rem;
+}
+
+@keyframes loading {
+  0% {
+    background-position: 200% 0;
+  }
+  100% {
+    background-position: -200% 0;
+  }
+}
+
+/* Responsive adjustments - Fixed the space-x issue */
+@media (max-width: 768px) {
+  .response-display .flex.space-x-2 {
+    flex-direction: column;
+    gap: 0.5rem; /* Using gap instead of space-x */
+  }
+  
+  .response-display .flex.space-x-2 > button {
+    width: 100%;
+    margin-bottom: 0.5rem;
+  }
+}
