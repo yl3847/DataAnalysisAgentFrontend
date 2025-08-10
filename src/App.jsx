@@ -4,6 +4,7 @@ import MainLayout from './components/Layout/MainLayout';
 import ChatBox from './components/ChatBox/ChatBox';
 import SampleDataDisplay from './components/DataTable/SampleDataDisplay';
 import ResponseDisplay from './components/ResponseDisplay/ResponseDisplay';
+import UserMenu from './components/UserMenu/UserMenu';
 import { useLocalStorage } from './hooks/useLocalStorage';
 import { useApi } from './hooks/useApi';
 
@@ -14,20 +15,82 @@ function App() {
   const [activeView, setActiveView] = useState('data');
   const [hassentFirstMessage, setHasSentFirstMessage] = useState(false);
   const [highlightedAnalysis, setHighlightedAnalysis] = useState(null);
+  const [selectedModel, setSelectedModel] = useState('claude-3-opus');
+  const [leftPanelWidth, setLeftPanelWidth] = useState(66.666); // percentage
+  const [isDragging, setIsDragging] = useState(false);
+  const [showUserMenu, setShowUserMenu] = useState(false);
+  
   const analysisRefs = useRef({});
+  const containerRef = useRef(null);
   const { sendQuery } = useApi();
+
+  // Handle panel resize
+  const handleMouseDown = (e) => {
+    setIsDragging(true);
+    e.preventDefault();
+  };
+
+  const handleMouseMove = useCallback((e) => {
+    if (!isDragging || !containerRef.current) return;
+    
+    const container = containerRef.current;
+    const containerRect = container.getBoundingClientRect();
+    const newWidth = ((e.clientX - containerRect.left) / containerRect.width) * 100;
+    
+    // Limit between 40% and 80%
+    if (newWidth >= 40 && newWidth <= 80) {
+      setLeftPanelWidth(newWidth);
+    }
+  }, [isDragging]);
+
+  const handleMouseUp = useCallback(() => {
+    setIsDragging(false);
+  }, []);
+
+  useEffect(() => {
+    if (isDragging) {
+      document.addEventListener('mousemove', handleMouseMove);
+      document.addEventListener('mouseup', handleMouseUp);
+      return () => {
+        document.removeEventListener('mousemove', handleMouseMove);
+        document.removeEventListener('mouseup', handleMouseUp);
+      };
+    }
+  }, [isDragging, handleMouseMove, handleMouseUp]);
 
   // Scroll to specific analysis when message is clicked
   const scrollToAnalysis = (messageId) => {
     const element = analysisRefs.current[messageId];
     if (element) {
-      element.scrollIntoView({ behavior: 'smooth', block: 'start' });
-      setHighlightedAnalysis(messageId);
-      setTimeout(() => setHighlightedAnalysis(null), 2000);
+      setActiveView('analysis'); // Switch to analysis view
+      setTimeout(() => {
+        element.scrollIntoView({ behavior: 'smooth', block: 'start' });
+        setHighlightedAnalysis(messageId);
+        setTimeout(() => setHighlightedAnalysis(null), 2000);
+      }, 100);
     }
   };
 
-  // Sample markdown generator with actual chart syntax
+  // Delete specific message and its analysis
+  const deleteMessage = useCallback((messageId) => {
+    setMessages(prev => prev.filter(m => m.id !== messageId));
+    setAnalysisHistory(prev => prev.filter(a => a.messageId !== messageId));
+  }, [setMessages, setAnalysisHistory]);
+
+  // Convert graph URL to markdown format
+  const convertGraphToMarkdown = (graphUrl) => {
+    // This would parse the graph URL and convert to markdown
+    // For now, returning sample markdown
+    // In production, you'd fetch the graph data from the URL and convert it
+    
+    // Example: If graphUrl contains chart configuration
+    // const chartData = await fetch(graphUrl).then(r => r.json());
+    // return generateMarkdownFromChartData(chartData);
+    
+    return generateSampleMarkdown();
+  };
+
+  // Sample markdown generator
   const generateSampleMarkdown = () => {
     const randomData = {
       signals: (Math.random() * 30 + 40).toFixed(1),
@@ -42,59 +105,43 @@ function App() {
 
 ### Driving Skills Assessment
 
-The analysis shows the performance distribution across key driving competencies:
-
 \`\`\`chart
 {
   "type": "bar",
   "data": [
-    {"category": "Signals", "value": ${randomData.signals}, "unit": "%"},
-    {"category": "Speed Control", "value": ${randomData.speedControl}, "unit": "%"},
-    {"category": "Night Drive", "value": ${randomData.nightDrive}, "unit": "%"},
-    {"category": "Road Signs", "value": ${randomData.roadSigns}, "unit": "%"},
-    {"category": "Parking", "value": ${randomData.parking}, "unit": "%"}
-  ],
-  "config": {
-    "xField": "value",
-    "yField": "category",
-    "color": "#3b82f6"
-  }
-}
-\`\`\`
-
-### Qualification Distribution by Age Group
-
-\`\`\`chart
-{
-  "type": "pie",
-  "data": [
-    {"type": "Teenager (Qualified)", "value": ${Math.floor(Math.random() * 5 + 10)}},
-    {"type": "Teenager (Not Qualified)", "value": ${Math.floor(Math.random() * 5 + 5)}},
-    {"type": "Young Adult (Qualified)", "value": ${Math.floor(Math.random() * 15 + 30)}},
-    {"type": "Young Adult (Not Qualified)", "value": ${Math.floor(Math.random() * 10 + 15)}},
-    {"type": "Middle Age (Qualified)", "value": ${Math.floor(Math.random() * 10 + 25)}},
-    {"type": "Middle Age (Not Qualified)", "value": ${Math.floor(Math.random() * 5 + 10)}}
+    {"category": "Signals", "value": ${randomData.signals}},
+    {"category": "Speed Control", "value": ${randomData.speedControl}},
+    {"category": "Night Drive", "value": ${randomData.nightDrive}},
+    {"category": "Road Signs", "value": ${randomData.roadSigns}},
+    {"category": "Parking", "value": ${randomData.parking}}
   ]
 }
 \`\`\`
 
-### Training Impact Analysis
+### Qualification Trends
 
-| Training Level | Pass Rate | Avg Score | Sample Size |
-|---------------|-----------|-----------|-------------|
-| None          | 28.6%     | 42.3      | 7           |
-| Basic         | 72.7%     | 58.9      | 11          |
-| Advanced      | 92.3%     | 74.2      | 13          |
+\`\`\`chart
+{
+  "type": "line",
+  "data": [
+    {"month": "Jan", "rate": 45},
+    {"month": "Feb", "rate": 48},
+    {"month": "Mar", "rate": 52},
+    {"month": "Apr", "rate": 51},
+    {"month": "May", "rate": 55},
+    {"month": "Jun", "rate": 58}
+  ]
+}
+\`\`\`
 `;
   };
 
   const generateSampleDescription = () => {
     const descriptions = [
-      "Based on the analysis of driving test performance metrics, the data reveals significant variations in skill proficiency across different categories. Speed control and road sign recognition show the strongest performance indicators, while parking and night driving present areas requiring additional focus.",
-      "The comprehensive assessment indicates a clear relationship between formal training participation and test success rates. Applicants with advanced training demonstrate a 92.3% pass rate, compared to only 28.6% for those without formal preparation.",
-      "Analysis of the current dataset highlights critical performance gaps in specific driving competencies. Signal usage and steering control show the highest variance among applicants, suggesting these areas require targeted intervention."
+      "Analysis reveals key performance indicators across multiple driving competencies, with notable variations in skill proficiency.",
+      "The data shows significant correlation between training levels and qualification success rates.",
+      "Performance metrics indicate areas of strength and opportunities for improvement in the current testing framework."
     ];
-    
     return descriptions[Math.floor(Math.random() * descriptions.length)];
   };
 
@@ -103,13 +150,13 @@ The analysis shows the performance distribution across key driving competencies:
       id: Date.now(),
       type: 'user',
       content: message,
+      model: selectedModel,
       timestamp: new Date().toISOString()
     };
     
     setMessages(prev => [...prev, userMessage]);
     setIsLoading(true);
     
-    // After first message, switch to analysis view
     if (!hassentFirstMessage) {
       setHasSentFirstMessage(true);
       setActiveView('analysis');
@@ -119,69 +166,79 @@ The analysis shows the performance distribution across key driving competencies:
       // Simulate backend delay
       await new Promise(resolve => setTimeout(resolve, 1500));
       
+      // ============================================
+      // BACKEND INTEGRATION POINT: Graph URL Processing
+      // In production:
+      // const response = await sendQuery(message, selectedModel);
+      // const markdown = await convertGraphToMarkdown(response.graphUrl);
+      // ============================================
+      
       const mockMarkdown = generateSampleMarkdown();
       const mockDescription = generateSampleDescription();
       
       const assistantMessage = {
         id: Date.now() + 1,
         type: 'assistant',
-        content: `I've analyzed the data based on your query: "${message}". The results have been generated and displayed in the Analysis Results panel.`,
+        content: `Analysis completed using ${selectedModel}. Results are displayed in the Analysis panel.`,
         timestamp: new Date().toISOString(),
-        analysisId: userMessage.id // Link to analysis
+        analysisId: userMessage.id
       };
       
       setMessages(prev => [...prev, assistantMessage]);
       
       const analysisResult = {
-        id: userMessage.id, // Use same ID for linking
+        id: userMessage.id,
         messageId: userMessage.id,
         query: message,
         markdown: mockMarkdown,
         description: mockDescription,
+        model: selectedModel,
         timestamp: new Date().toISOString()
       };
       
       setAnalysisHistory(prev => [...prev, analysisResult]);
       
-      // Auto-scroll to new analysis after adding
       setTimeout(() => {
         scrollToAnalysis(userMessage.id);
       }, 100);
       
     } catch (error) {
-      console.error('Error sending message:', error);
+      console.error('Error:', error);
       const errorMessage = {
         id: Date.now() + 1,
         type: 'error',
-        content: 'Failed to get response. Please try again.',
+        content: 'Failed to process request. Please try again.',
         timestamp: new Date().toISOString()
       };
       setMessages(prev => [...prev, errorMessage]);
     } finally {
       setIsLoading(false);
     }
-  }, [hassentFirstMessage, setMessages, setAnalysisHistory]);
+  }, [selectedModel, hassentFirstMessage, setMessages, setAnalysisHistory]);
 
-  const handleClearChat = useCallback(() => {
+  const handleClearAll = useCallback(() => {
     setMessages([]);
     setAnalysisHistory([]);
     setHasSentFirstMessage(false);
     setActiveView('data');
   }, [setMessages, setAnalysisHistory]);
 
-  const handleClearAnalysis = useCallback(() => {
-    setAnalysisHistory([]);
-  }, [setAnalysisHistory]);
-
   return (
     <div className="App min-h-screen bg-gradient-to-br from-gray-50 to-gray-100 overflow-hidden">
-      <MainLayout>
+      <MainLayout onUserMenuClick={() => setShowUserMenu(true)}>
         <div className="container mx-auto px-4 py-4 h-full">
-          <div className="grid grid-cols-3 gap-4 h-full" style={{ height: 'calc(100vh - 100px)' }}>
+          <div 
+            ref={containerRef}
+            className="flex gap-4 h-full" 
+            style={{ height: 'calc(100vh - 100px)' }}
+          >
             
-            {/* Left Side - 2/3 of page - Data/Analysis View */}
-            <div className="col-span-2 h-full overflow-hidden">
-              <div className="bg-white rounded-xl shadow-lg h-full flex flex-col">
+            {/* Left Panel - Data/Analysis View */}
+            <div 
+              className="h-full overflow-hidden"
+              style={{ width: `${leftPanelWidth}%` }}
+            >
+              <div className="bg-white rounded-2xl shadow-lg h-full flex flex-col">
                 {/* Tab Navigation */}
                 <div className="border-b px-6 py-3 flex-shrink-0">
                   <div className="flex items-center justify-between">
@@ -212,18 +269,10 @@ The analysis shows the performance distribution across key driving competencies:
                         )}
                       </button>
                     </div>
-                    {activeView === 'analysis' && analysisHistory.length > 0 && (
-                      <button
-                        onClick={handleClearAnalysis}
-                        className="text-sm text-gray-500 hover:text-gray-700 transition-colors"
-                      >
-                        Clear History
-                      </button>
-                    )}
                   </div>
                 </div>
 
-                {/* Content Area with Scroll */}
+                {/* Content Area */}
                 <div className="flex-1 overflow-y-auto p-6 analysis-scroll-area">
                   {activeView === 'data' ? (
                     <SampleDataDisplay />
@@ -249,20 +298,29 @@ The analysis shows the performance distribution across key driving competencies:
                                   ? 'bg-blue-50 border-blue-400 shadow-lg' 
                                   : 'bg-gray-50'
                               }`}
-                              data-message-id={analysis.messageId}
                             >
-                              <div className="mb-4">
-                                <div className="flex items-center justify-between mb-2">
+                              <div className="mb-4 flex justify-between items-start">
+                                <div>
                                   <h3 className="text-lg font-semibold text-gray-800">
                                     Analysis #{index + 1}
                                   </h3>
-                                  <span className="text-xs text-gray-500">
-                                    {new Date(analysis.timestamp).toLocaleString()}
-                                  </span>
+                                  <p className="text-sm text-gray-600 italic mt-1">
+                                    Query: "{analysis.query}"
+                                  </p>
+                                  <p className="text-xs text-gray-500 mt-1">
+                                    Model: {analysis.model} • {new Date(analysis.timestamp).toLocaleString()}
+                                  </p>
                                 </div>
-                                <p className="text-sm text-gray-600 italic">
-                                  Query: "{analysis.query}"
-                                </p>
+                                <button
+                                  onClick={() => deleteMessage(analysis.messageId)}
+                                  className="text-red-500 hover:text-red-700 p-1"
+                                  title="Delete this analysis"
+                                >
+                                  <svg className="w-5 h-5" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                                    <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} 
+                                      d="M19 7l-.867 12.142A2 2 0 0116.138 21H7.862a2 2 0 01-1.995-1.858L5 7m5 4v6m4-6v6m1-10V4a1 1 0 00-1-1h-4a1 1 0 00-1 1v3M4 7h16" />
+                                  </svg>
+                                </button>
                               </div>
                               
                               <ResponseDisplay 
@@ -280,19 +338,30 @@ The analysis shows the performance distribution across key driving competencies:
                 </div>
               </div>
             </div>
+
+            {/* Resize Handle */}
+            <div
+              className={`resize-handle ${isDragging ? 'active' : ''}`}
+              onMouseDown={handleMouseDown}
+            >
+              <div className="resize-handle-bar" />
+            </div>
             
-            {/* Right Side - 1/3 of page - Chat */}
-            <div className="col-span-1 h-full overflow-hidden">
-              <div className="bg-white rounded-xl shadow-lg h-full flex flex-col">
+            {/* Right Panel - Chat */}
+            <div 
+              className="h-full overflow-hidden flex-1"
+              style={{ width: `${100 - leftPanelWidth}%` }}
+            >
+              <div className="bg-white rounded-2xl shadow-lg h-full flex flex-col">
                 <div className="border-b px-4 py-3 flex justify-between items-center flex-shrink-0">
                   <h2 className="text-lg font-semibold text-gray-800">
                     Analytics Chat
                   </h2>
                   <button
-                    onClick={handleClearChat}
+                    onClick={handleClearAll}
                     className="text-sm text-gray-500 hover:text-gray-700 transition-colors"
                   >
-                    Clear
+                    Clear All
                   </button>
                 </div>
                 <ChatBox
@@ -300,6 +369,9 @@ The analysis shows the performance distribution across key driving competencies:
                   onSendMessage={handleSendMessage}
                   isLoading={isLoading}
                   onMessageClick={scrollToAnalysis}
+                  onDeleteMessage={deleteMessage}
+                  selectedModel={selectedModel}
+                  onModelChange={setSelectedModel}
                 />
               </div>
             </div>
@@ -307,6 +379,11 @@ The analysis shows the performance distribution across key driving competencies:
           </div>
         </div>
       </MainLayout>
+      
+      {/* User Menu Modal */}
+      {showUserMenu && (
+        <UserMenu onClose={() => setShowUserMenu(false)} />
+      )}
     </div>
   );
 }

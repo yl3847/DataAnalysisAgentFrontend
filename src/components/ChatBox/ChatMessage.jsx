@@ -1,7 +1,8 @@
 import React, { useState } from 'react';
 
-const ChatMessage = ({ message, onClick }) => {
+const ChatMessage = ({ message, onClick, onDelete }) => {
   const [copied, setCopied] = useState(false);
+  const [showDelete, setShowDelete] = useState(false);
   
   const isUser = message.type === 'user';
   const isError = message.type === 'error';
@@ -22,10 +23,9 @@ const ChatMessage = ({ message, onClick }) => {
 
   return (
     <div 
-      className={`chat-message-wrapper ${isUser ? 'flex-row-reverse' : ''} flex items-start space-x-2 ${
-        isUser && onClick ? 'cursor-pointer hover:opacity-80' : ''
-      }`}
-      onClick={onClick}
+      className={`chat-message-wrapper ${isUser ? 'flex-row-reverse' : ''} flex items-start space-x-2 group`}
+      onMouseEnter={() => setShowDelete(true)}
+      onMouseLeave={() => setShowDelete(false)}
     >
       {/* Avatar */}
       <div className={`flex-shrink-0 ${isUser ? 'ml-2' : 'mr-2'}`}>
@@ -35,7 +35,7 @@ const ChatMessage = ({ message, onClick }) => {
           {isUser ? (
             <svg className="w-5 h-5 text-white" fill="currentColor" viewBox="0 0 20 20">
               <path fillRule="evenodd" d="M10 9a3 3 0 100-6 3 3 0 000 6zm-7 9a7 7 0 1114 0H3z" clipRule="evenodd" />
-            </svg>
+              </svg>
           ) : isError ? (
             <svg className="w-5 h-5 text-white" fill="currentColor" viewBox="0 0 20 20">
               <path fillRule="evenodd" d="M18 10a8 8 0 11-16 0 8 8 0 0116 0zm-7 4a1 1 0 11-2 0 1 1 0 012 0zm-1-9a1 1 0 00-1 1v4a1 1 0 102 0V6a1 1 0 00-1-1z" clipRule="evenodd" />
@@ -50,14 +50,17 @@ const ChatMessage = ({ message, onClick }) => {
 
       {/* Message Content */}
       <div className={`flex-1 ${isUser ? 'flex justify-end' : ''}`}>
-        <div className={`max-w-xs ${isUser ? 'ml-auto' : ''}`}>
-          <div className={`rounded-lg px-3 py-2 ${
-            isUser 
-              ? 'bg-blue-600 text-white' 
-              : isError 
-                ? 'bg-red-50 text-red-800 border border-red-200'
-                : 'bg-gray-100 text-gray-800'
-          }`}>
+        <div className={`max-w-xs ${isUser ? 'ml-auto' : ''} relative`}>
+          <div 
+            className={`rounded-lg px-3 py-2 ${
+              isUser 
+                ? 'bg-blue-600 text-white cursor-pointer hover:bg-blue-700' 
+                : isError 
+                  ? 'bg-red-50 text-red-800 border border-red-200'
+                  : 'bg-gray-100 text-gray-800'
+            }`}
+            onClick={isUser ? onClick : undefined}
+          >
             {/* Message Header */}
             <div className="flex items-center justify-between mb-1">
               <span className={`text-xs font-medium ${
@@ -85,7 +88,23 @@ const ChatMessage = ({ message, onClick }) => {
             )}
           </div>
 
-          {/* Message Actions */}
+          {/* Delete button */}
+          {showDelete && onDelete && (
+            <button
+              onClick={(e) => {
+                e.stopPropagation();
+                onDelete();
+              }}
+              className={`absolute ${isUser ? 'right-full mr-2' : 'left-full ml-2'} top-0 p-1 bg-red-500 text-white rounded opacity-0 group-hover:opacity-100 transition-opacity`}
+              title="Delete message"
+            >
+              <svg className="w-4 h-4" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M6 18L18 6M6 6l12 12" />
+              </svg>
+            </button>
+          )}
+
+          {/* Copy button for assistant messages */}
           {!isUser && !isError && (
             <div className="flex items-center space-x-2 mt-1">
               <button

@@ -4,19 +4,35 @@
   overflow: hidden;
 }
 
-/* Main layout adjustments */
-.main-layout {
-  height: 100vh;
+/* Resize Handle */
+.resize-handle {
+  width: 12px;
+  cursor: col-resize;
+  position: relative;
+  user-select: none;
   display: flex;
-  flex-direction: column;
+  align-items: center;
+  justify-content: center;
 }
 
-.main-layout main {
-  flex: 1;
-  overflow: hidden;
+.resize-handle:hover .resize-handle-bar,
+.resize-handle.active .resize-handle-bar {
+  background: #cbd5e0;
 }
 
-/* Scrollbar styles for analysis area */
+.resize-handle-bar {
+  width: 4px;
+  height: 40px;
+  background: #e2e8f0;
+  border-radius: 2px;
+  transition: background 0.2s;
+}
+
+.resize-handle.active {
+  background: rgba(59, 130, 246, 0.1);
+}
+
+/* Scrollbar styles */
 .analysis-scroll-area {
   overflow-y: auto !important;
   height: 100%;
@@ -67,13 +83,25 @@
   background: #9ca3af;
 }
 
-/* Highlight animation */
-@keyframes highlightPulse {
-  0% { background-color: rgba(59, 130, 246, 0.1); }
-  50% { background-color: rgba(59, 130, 246, 0.2); }
-  100% { background-color: rgba(59, 130, 246, 0.1); }
+/* Sample prompts styling */
+.sample-prompts {
+  background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+  -webkit-background-clip: text;
+  -webkit-text-fill-color: transparent;
+  background-clip: text;
 }
 
-.highlight-analysis {
-  animation: highlightPulse 2s ease-in-out;
+/* Model selector */
+.model-selector {
+  background: #f7fafc;
+  border: 1px solid #e2e8f0;
+  border-radius: 8px;
+  padding: 4px 8px;
+  font-size: 12px;
+  transition: all 0.2s;
+}
+
+.model-selector:hover {
+  background: #edf2f7;
+  border-color: #cbd5e0;
 }

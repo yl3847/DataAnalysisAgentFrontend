@@ -1,15 +1,13 @@
 import React from 'react';
 
-const Header = () => {
+const Header = ({ onUserMenuClick }) => {
   const [connectionStatus, setConnectionStatus] = React.useState('connected');
 
   React.useEffect(() => {
-    // Check backend connection status
     const checkConnection = async () => {
       try {
         const lambdaUrl = process.env.REACT_APP_LAMBDA_URL;
-        if (lambdaUrl && !process.env.REACT_APP_USE_MOCK_DATA === 'true') {
-          // Simple health check
+        if (lambdaUrl && process.env.REACT_APP_USE_MOCK_DATA !== 'true') {
           const response = await fetch(`${lambdaUrl}/health`, { 
             method: 'GET',
             mode: 'cors'
@@ -25,34 +23,25 @@ const Header = () => {
     };
 
     checkConnection();
-    const interval = setInterval(checkConnection, 30000); // Check every 30 seconds
-
+    const interval = setInterval(checkConnection, 30000);
     return () => clearInterval(interval);
   }, []);
 
   const getStatusColor = () => {
     switch (connectionStatus) {
-      case 'connected':
-        return 'bg-green-500';
-      case 'mock':
-        return 'bg-yellow-500';
-      case 'disconnected':
-        return 'bg-red-500';
-      default:
-        return 'bg-gray-500';
+      case 'connected': return 'bg-green-500';
+      case 'mock': return 'bg-yellow-500';
+      case 'disconnected': return 'bg-red-500';
+      default: return 'bg-gray-500';
     }
   };
 
   const getStatusText = () => {
     switch (connectionStatus) {
-      case 'connected':
-        return 'Connected to AWS';
-      case 'mock':
-        return 'Using Mock Data';
-      case 'disconnected':
-        return 'Disconnected';
-      default:
-        return 'Unknown';
+      case 'connected': return 'Connected to AWS';
+      case 'mock': return 'Using Mock Data';
+      case 'disconnected': return 'Disconnected';
+      default: return 'Unknown';
     }
   };
 
@@ -91,12 +80,12 @@ const Header = () => {
             </div>
             
             <button
+              onClick={onUserMenuClick}
               className="p-2 rounded-lg hover:bg-gray-100 transition-colors"
-              onClick={() => window.location.reload()}
-              title="Refresh"
+              title="User Settings"
             >
               <svg
-                className="h-5 w-5 text-gray-600"
+                className="h-6 w-6 text-gray-600"
                 fill="none"
                 viewBox="0 0 24 24"
                 stroke="currentColor"
@@ -105,7 +94,7 @@ const Header = () => {
                   strokeLinecap="round"
                   strokeLinejoin="round"
                   strokeWidth={2}
-                  d="M4 4v5h.582m15.356 2A8.001 8.001 0 004.582 9m0 0H9m11 11v-5h-.581m0 0a8.003 8.003 0 01-15.357-2m15.357 2H15"
+                  d="M5.121 17.804A13.937 13.937 0 0112 16c2.5 0 4.847.655 6.879 1.804M15 10a3 3 0 11-6 0 3 3 0 016 0zm6 2a9 9 0 11-18 0 9 9 0 0118 0z"
                 />
               </svg>
             </button>
