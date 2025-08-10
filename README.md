@@ -18,3 +18,6 @@ cd frontend
 
 # Install all required packages
 npm install
+
+# Run 
+npm start
