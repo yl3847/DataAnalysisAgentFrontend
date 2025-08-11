@@ -16,7 +16,7 @@ function App() {
   const [hassentFirstMessage, setHasSentFirstMessage] = useState(false);
   const [highlightedAnalysis, setHighlightedAnalysis] = useState(null);
   const [selectedModel, setSelectedModel] = useState('claude-3-opus');
-  const [leftPanelWidth, setLeftPanelWidth] = useState(66.666); // percentage
+  const [leftPanelWidth, setLeftPanelWidth] = useState(66.666);
   const [isDragging, setIsDragging] = useState(false);
   const [showUserMenu, setShowUserMenu] = useState(false);
   
@@ -37,7 +37,6 @@ function App() {
     const containerRect = container.getBoundingClientRect();
     const newWidth = ((e.clientX - containerRect.left) / containerRect.width) * 100;
     
-    // Limit between 40% and 80%
     if (newWidth >= 40 && newWidth <= 80) {
       setLeftPanelWidth(newWidth);
     }
@@ -58,11 +57,11 @@ function App() {
     }
   }, [isDragging, handleMouseMove, handleMouseUp]);
 
-  // Scroll to specific analysis when message is clicked
+  // Scroll to specific analysis
   const scrollToAnalysis = (messageId) => {
     const element = analysisRefs.current[messageId];
     if (element) {
-      setActiveView('analysis'); // Switch to analysis view
+      setActiveView('analysis');
       setTimeout(() => {
         element.scrollIntoView({ behavior: 'smooth', block: 'start' });
         setHighlightedAnalysis(messageId);
@@ -71,26 +70,27 @@ function App() {
     }
   };
 
-  // Delete specific message and its analysis
+  // Delete message and corresponding analysis
   const deleteMessage = useCallback((messageId) => {
-    setMessages(prev => prev.filter(m => m.id !== messageId));
-    setAnalysisHistory(prev => prev.filter(a => a.messageId !== messageId));
-  }, [setMessages, setAnalysisHistory]);
-
-  // Convert graph URL to markdown format
-  const convertGraphToMarkdown = (graphUrl) => {
-    // This would parse the graph URL and convert to markdown
-    // For now, returning sample markdown
-    // In production, you'd fetch the graph data from the URL and convert it
+    // Find if this is a user message with corresponding assistant message
+    const messageToDelete = messages.find(m => m.id === messageId);
     
-    // Example: If graphUrl contains chart configuration
-    // const chartData = await fetch(graphUrl).then(r => r.json());
-    // return generateMarkdownFromChartData(chartData);
-    
-    return generateSampleMarkdown();
-  };
+    if (messageToDelete?.type === 'user') {
+      // Delete user message, its assistant response, and analysis
+      setMessages(prev => prev.filter(m => 
+        m.id !== messageId && m.analysisId !== messageId
+      ));
+      setAnalysisHistory(prev => prev.filter(a => a.messageId !== messageId));
+    } else if (messageToDelete?.type === 'assistant') {
+      // Delete assistant message and find/delete corresponding user message and analysis
+      const analysisId = messageToDelete.analysisId;
+      setMessages(prev => prev.filter(m => 
+        m.id !== messageId && m.id !== analysisId
+      ));
+      setAnalysisHistory(prev => prev.filter(a => a.messageId !== analysisId));
+    }
+  }, [messages, setMessages, setAnalysisHistory]);
 
-  // Sample markdown generator
   const generateSampleMarkdown = () => {
     const randomData = {
       signals: (Math.random() * 30 + 40).toFixed(1),
@@ -140,17 +140,21 @@ function App() {
     const descriptions = [
       "Analysis reveals key performance indicators across multiple driving competencies, with notable variations in skill proficiency.",
       "The data shows significant correlation between training levels and qualification success rates.",
-      "Performance metrics indicate areas of strength and opportunities for improvement in the current testing framework."
+      "Performance metrics indicate areas of strength and opportunities for improvement."
     ];
     return descriptions[Math.floor(Math.random() * descriptions.length)];
   };
 
   const handleSendMessage = useCallback(async (message) => {
+    // Get the analysis number
+    const analysisNumber = analysisHistory.length + 1;
+    
     const userMessage = {
       id: Date.now(),
       type: 'user',
       content: message,
       model: selectedModel,
+      analysisNumber,
       timestamp: new Date().toISOString()
     };
     
@@ -163,25 +167,19 @@ function App() {
     }
 
     try {
-      // Simulate backend delay
       await new Promise(resolve => setTimeout(resolve, 1500));
-      
-      // ============================================
-      // BACKEND INTEGRATION POINT: Graph URL Processing
-      // In production:
-      // const response = await sendQuery(message, selectedModel);
-      // const markdown = await convertGraphToMarkdown(response.graphUrl);
-      // ============================================
       
       const mockMarkdown = generateSampleMarkdown();
       const mockDescription = generateSampleDescription();
       
+      // Include the original query in the response
       const assistantMessage = {
         id: Date.now() + 1,
         type: 'assistant',
-        content: `Analysis completed using ${selectedModel}. Results are displayed in the Analysis panel.`,
+        content: `Analysis #${analysisNumber} completed using ${selectedModel}.\n\nYour query: "${message}"\n\nThe detailed results are displayed in the Analysis Results panel.`,
         timestamp: new Date().toISOString(),
-        analysisId: userMessage.id
+        analysisId: userMessage.id,
+        analysisNumber
       };
       
       setMessages(prev => [...prev, assistantMessage]);
@@ -193,6 +191,7 @@ function App() {
         markdown: mockMarkdown,
         description: mockDescription,
         model: selectedModel,
+        analysisNumber,
         timestamp: new Date().toISOString()
       };
       
@@ -214,7 +213,7 @@ function App() {
     } finally {
       setIsLoading(false);
     }
-  }, [selectedModel, hassentFirstMessage, setMessages, setAnalysisHistory]);
+  }, [selectedModel, hassentFirstMessage, analysisHistory.length, setMessages, setAnalysisHistory]);
 
   const handleClearAll = useCallback(() => {
     setMessages([]);
@@ -238,16 +237,16 @@ function App() {
               className="h-full overflow-hidden"
               style={{ width: `${leftPanelWidth}%` }}
             >
-              <div className="bg-white rounded-2xl shadow-lg h-full flex flex-col">
-                {/* Tab Navigation */}
-                <div className="border-b px-6 py-3 flex-shrink-0">
+              <div className="bg-white rounded-2xl shadow-lg h-full flex flex-col overflow-hidden">
+                {/* Tab Navigation - Matching chat header style */}
+                <div className="border-b px-6 py-4 flex-shrink-0">
                   <div className="flex items-center justify-between">
                     <div className="flex space-x-1">
                       <button
                         onClick={() => setActiveView('data')}
-                        className={`px-4 py-2 text-sm font-medium rounded-lg transition-colors ${
+                        className={`px-4 py-2 text-sm font-medium rounded-lg transition-all ${
                           activeView === 'data'
-                            ? 'bg-blue-100 text-blue-700'
+                            ? 'bg-gradient-to-r from-blue-500 to-blue-600 text-white shadow-sm'
                             : 'text-gray-600 hover:text-gray-800 hover:bg-gray-100'
                         }`}
                       >
@@ -255,15 +254,15 @@ function App() {
                       </button>
                       <button
                         onClick={() => setActiveView('analysis')}
-                        className={`px-4 py-2 text-sm font-medium rounded-lg transition-colors ${
+                        className={`px-4 py-2 text-sm font-medium rounded-lg transition-all ${
                           activeView === 'analysis'
-                            ? 'bg-blue-100 text-blue-700'
+                            ? 'bg-gradient-to-r from-blue-500 to-blue-600 text-white shadow-sm'
                             : 'text-gray-600 hover:text-gray-800 hover:bg-gray-100'
                         }`}
                       >
                         Analysis Results
                         {analysisHistory.length > 0 && (
-                          <span className="ml-2 px-2 py-0.5 text-xs bg-blue-600 text-white rounded-full">
+                          <span className="ml-2 px-2 py-0.5 text-xs bg-white bg-opacity-20 rounded-full">
                             {analysisHistory.length}
                           </span>
                         )}
@@ -289,20 +288,20 @@ function App() {
                         </div>
                       ) : (
                         <div className="space-y-6">
-                          {analysisHistory.map((analysis, index) => (
+                          {analysisHistory.map((analysis) => (
                             <div 
                               key={analysis.id}
                               ref={el => analysisRefs.current[analysis.messageId] = el}
                               className={`border rounded-lg p-6 transition-all duration-500 ${
                                 highlightedAnalysis === analysis.messageId 
-                                  ? 'bg-blue-50 border-blue-400 shadow-lg' 
-                                  : 'bg-gray-50'
+                                  ? 'bg-blue-50 border-blue-400 shadow-lg ring-2 ring-blue-400 ring-opacity-50' 
+                                  : 'bg-gray-50 border-gray-200'
                               }`}
                             >
                               <div className="mb-4 flex justify-between items-start">
                                 <div>
                                   <h3 className="text-lg font-semibold text-gray-800">
-                                    Analysis #{index + 1}
+                                    Analysis #{analysis.analysisNumber}
                                   </h3>
                                   <p className="text-sm text-gray-600 italic mt-1">
                                     Query: "{analysis.query}"
@@ -313,7 +312,7 @@ function App() {
                                 </div>
                                 <button
                                   onClick={() => deleteMessage(analysis.messageId)}
-                                  className="text-red-500 hover:text-red-700 p-1"
+                                  className="text-red-500 hover:text-red-700 p-1 hover:bg-red-50 rounded transition-colors"
                                   title="Delete this analysis"
                                 >
                                   <svg className="w-5 h-5" fill="none" viewBox="0 0 24 24" stroke="currentColor">
@@ -352,14 +351,15 @@ function App() {
               className="h-full overflow-hidden flex-1"
               style={{ width: `${100 - leftPanelWidth}%` }}
             >
-              <div className="bg-white rounded-2xl shadow-lg h-full flex flex-col">
-                <div className="border-b px-4 py-3 flex justify-between items-center flex-shrink-0">
+              <div className="bg-white rounded-2xl shadow-lg h-full flex flex-col overflow-hidden">
+                {/* Chat header - Matching data panel style */}
+                <div className="border-b px-6 py-4 flex justify-between items-center flex-shrink-0">
                   <h2 className="text-lg font-semibold text-gray-800">
                     Analytics Chat
                   </h2>
                   <button
                     onClick={handleClearAll}
-                    className="text-sm text-gray-500 hover:text-gray-700 transition-colors"
+                    className="text-sm px-3 py-1 text-gray-500 hover:text-gray-700 hover:bg-gray-100 rounded-lg transition-colors"
                   >
                     Clear All
                   </button>
@@ -380,7 +380,6 @@ function App() {
         </div>
       </MainLayout>
       
-      {/* User Menu Modal */}
       {showUserMenu && (
         <UserMenu onClose={() => setShowUserMenu(false)} />
       )}
