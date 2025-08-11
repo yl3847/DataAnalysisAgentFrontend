@@ -19,6 +19,7 @@ function App() {
   const [leftPanelWidth, setLeftPanelWidth] = useState(66.666);
   const [isDragging, setIsDragging] = useState(false);
   const [showUserMenu, setShowUserMenu] = useState(false);
+  const [nextAnalysisNumber, setNextAnalysisNumber] = useLocalStorage('next-analysis-number', 1);
   
   const analysisRefs = useRef({});
   const containerRef = useRef(null);
@@ -57,22 +58,29 @@ function App() {
     }
   }, [isDragging, handleMouseMove, handleMouseUp]);
 
-  // Scroll to specific analysis
-  const scrollToAnalysis = (messageId) => {
+  // Scroll to specific analysis when clicking on chat message
+  const scrollToAnalysis = useCallback((messageId) => {
+    // Find the analysis with this messageId
+    const analysis = analysisHistory.find(a => a.messageId === messageId);
+    if (!analysis) return;
+    
     const element = analysisRefs.current[messageId];
     if (element) {
+      // Switch to analysis view first
       setActiveView('analysis');
+      
+      // Wait for view change then scroll
       setTimeout(() => {
-        element.scrollIntoView({ behavior: 'smooth', block: 'start' });
+        element.scrollIntoView({ behavior: 'smooth', block: 'center' });
         setHighlightedAnalysis(messageId);
-        setTimeout(() => setHighlightedAnalysis(null), 2000);
+        setTimeout(() => setHighlightedAnalysis(null), 3000);
       }, 100);
     }
-  };
+  }, [analysisHistory]);
 
   // Delete message and corresponding analysis
   const deleteMessage = useCallback((messageId) => {
-    // Find if this is a user message with corresponding assistant message
+    // Find the message
     const messageToDelete = messages.find(m => m.id === messageId);
     
     if (messageToDelete?.type === 'user') {
@@ -82,7 +90,7 @@ function App() {
       ));
       setAnalysisHistory(prev => prev.filter(a => a.messageId !== messageId));
     } else if (messageToDelete?.type === 'assistant') {
-      // Delete assistant message and find/delete corresponding user message and analysis
+      // Delete assistant message and corresponding user message and analysis
       const analysisId = messageToDelete.analysisId;
       setMessages(prev => prev.filter(m => 
         m.id !== messageId && m.id !== analysisId
@@ -90,6 +98,17 @@ function App() {
       setAnalysisHistory(prev => prev.filter(a => a.messageId !== analysisId));
     }
   }, [messages, setMessages, setAnalysisHistory]);
+
+  // Delete analysis and corresponding messages
+  const deleteAnalysis = useCallback((analysisId) => {
+    // Delete the analysis
+    setAnalysisHistory(prev => prev.filter(a => a.messageId !== analysisId));
+    
+    // Delete corresponding messages (user and assistant)
+    setMessages(prev => prev.filter(m => 
+      m.id !== analysisId && m.analysisId !== analysisId
+    ));
+  }, [setAnalysisHistory, setMessages]);
 
   const generateSampleMarkdown = () => {
     const randomData = {
@@ -146,8 +165,9 @@ function App() {
   };
 
   const handleSendMessage = useCallback(async (message) => {
-    // Get the analysis number
-    const analysisNumber = analysisHistory.length + 1;
+    // Use the next available analysis number
+    const analysisNumber = nextAnalysisNumber;
+    setNextAnalysisNumber(prev => prev + 1);
     
     const userMessage = {
       id: Date.now(),
@@ -172,11 +192,11 @@ function App() {
       const mockMarkdown = generateSampleMarkdown();
       const mockDescription = generateSampleDescription();
       
-      // Include the original query in the response
+      // Don't repeat the analysis number in the content
       const assistantMessage = {
         id: Date.now() + 1,
         type: 'assistant',
-        content: `Analysis #${analysisNumber} completed using ${selectedModel}.\n\nYour query: "${message}"\n\nThe detailed results are displayed in the Analysis Results panel.`,
+        content: `Processing completed using ${selectedModel}.\n\nYour query: "${message}"\n\nThe detailed results are displayed in the Analysis Results panel.`,
         timestamp: new Date().toISOString(),
         analysisId: userMessage.id,
         analysisNumber
@@ -197,6 +217,7 @@ function App() {
       
       setAnalysisHistory(prev => [...prev, analysisResult]);
       
+      // Auto-scroll to new analysis
       setTimeout(() => {
         scrollToAnalysis(userMessage.id);
       }, 100);
@@ -213,14 +234,15 @@ function App() {
     } finally {
       setIsLoading(false);
     }
-  }, [selectedModel, hassentFirstMessage, analysisHistory.length, setMessages, setAnalysisHistory]);
+  }, [selectedModel, hassentFirstMessage, nextAnalysisNumber, setNextAnalysisNumber, setMessages, setAnalysisHistory, scrollToAnalysis]);
 
   const handleClearAll = useCallback(() => {
     setMessages([]);
     setAnalysisHistory([]);
     setHasSentFirstMessage(false);
     setActiveView('data');
-  }, [setMessages, setAnalysisHistory]);
+    setNextAnalysisNumber(1);
+  }, [setMessages, setAnalysisHistory, setNextAnalysisNumber]);
 
   return (
     <div className="App min-h-screen bg-gradient-to-br from-gray-50 to-gray-100 overflow-hidden">
@@ -238,7 +260,7 @@ function App() {
               style={{ width: `${leftPanelWidth}%` }}
             >
               <div className="bg-white rounded-2xl shadow-lg h-full flex flex-col overflow-hidden">
-                {/* Tab Navigation - Matching chat header style */}
+                {/* Tab Navigation */}
                 <div className="border-b px-6 py-4 flex-shrink-0">
                   <div className="flex items-center justify-between">
                     <div className="flex space-x-1">
@@ -311,8 +333,8 @@ function App() {
                                   </p>
                                 </div>
                                 <button
-                                  onClick={() => deleteMessage(analysis.messageId)}
-                                  className="text-red-500 hover:text-red-700 p-1 hover:bg-red-50 rounded transition-colors"
+                                  onClick={() => deleteAnalysis(analysis.messageId)}
+                                  className="text-red-500 hover:text-red-700 p-2 hover:bg-red-50 rounded-lg transition-colors"
                                   title="Delete this analysis"
                                 >
                                   <svg className="w-5 h-5" fill="none" viewBox="0 0 24 24" stroke="currentColor">
@@ -352,7 +374,6 @@ function App() {
               style={{ width: `${100 - leftPanelWidth}%` }}
             >
               <div className="bg-white rounded-2xl shadow-lg h-full flex flex-col overflow-hidden">
-                {/* Chat header - Matching data panel style */}
                 <div className="border-b px-6 py-4 flex justify-between items-center flex-shrink-0">
                   <h2 className="text-lg font-semibold text-gray-800">
                     Analytics Chat
