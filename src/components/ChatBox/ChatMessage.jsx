@@ -22,10 +22,13 @@ const ChatMessage = ({ message, onClick, onDelete }) => {
   };
 
   const handleClick = () => {
-    if (isUser && onClick) {
+    if (onClick) {
       onClick();
     }
   };
+
+  // Parse content to check if it contains Analysis # label
+  const hasAnalysisLabel = message.content && message.content.includes('**Analysis #');
 
   return (
     <div 
@@ -57,7 +60,7 @@ const ChatMessage = ({ message, onClick, onDelete }) => {
       {/* Message Content */}
       <div className={`flex-1 ${isUser ? 'flex justify-end' : ''}`}>
         <div className={`max-w-xs ${isUser ? 'ml-auto' : ''} relative`}>
-          {/* Analysis Number Badge - Only show for user messages */}
+          {/* Analysis Number Badge - Only for user messages */}
           {isUser && message.analysisNumber && (
             <div className="text-xs text-gray-500 mb-1">
               Analysis #{message.analysisNumber}
@@ -66,11 +69,15 @@ const ChatMessage = ({ message, onClick, onDelete }) => {
           
           <div 
             className={`rounded-lg px-3 py-2 ${
+              isUser || isAssistant
+                ? 'cursor-pointer' 
+                : ''
+            } ${
               isUser 
-                ? 'bg-gradient-to-r from-blue-500 to-blue-600 text-white cursor-pointer hover:from-blue-600 hover:to-blue-700 shadow-sm' 
+                ? 'bg-gradient-to-r from-blue-500 to-blue-600 text-white hover:from-blue-600 hover:to-blue-700 shadow-sm' 
                 : isError 
                   ? 'bg-red-50 text-red-800 border border-red-200'
-                  : 'bg-gray-100 text-gray-800'
+                  : 'bg-gray-100 text-gray-800 hover:bg-gray-200'
             } transition-all`}
             onClick={handleClick}
           >
@@ -90,26 +97,36 @@ const ChatMessage = ({ message, onClick, onDelete }) => {
 
             {/* Message Text */}
             <div className="text-sm whitespace-pre-wrap">
-              {message.content}
+              {/* Render content with bold support for Analysis # */}
+              {hasAnalysisLabel ? (
+                <div dangerouslySetInnerHTML={{ 
+                  __html: message.content.replace(/\*\*(.*?)\*\*/g, '<strong>$1</strong>') 
+                }} />
+              ) : (
+                message.content
+              )}
             </div>
 
-            {/* Click hint for user messages */}
-            {isUser && (
+            {/* Click hint */}
+            {(isUser || (isAssistant && hasAnalysisLabel)) && (
               <div className="text-xs mt-2 opacity-80 flex items-center">
                 <svg className="w-3 h-3 mr-1" fill="none" viewBox="0 0 24 24" stroke="currentColor">
                   <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M13 7l5 5m0 0l-5 5m5-5H6" />
                 </svg>
-                Click to view analysis
+                {isUser ? 'Click to view analysis' : 'Click to view in analysis panel'}
               </div>
             )}
           </div>
 
-          {/* Action buttons */}
-          <div className="flex items-center space-x-2 mt-1">
-            {/* Copy button */}
-            {!isError && (
+          {/* Action buttons - Only show for assistant messages, not user messages */}
+          {isAssistant && (
+            <div className="flex items-center space-x-2 mt-1">
+              {/* Copy button */}
               <button
-                onClick={copyToClipboard}
+                onClick={(e) => {
+                  e.stopPropagation();
+                  copyToClipboard();
+                }}
                 className="text-xs text-gray-500 hover:text-gray-700 flex items-center space-x-1 transition-colors"
               >
                 {copied ? (
@@ -129,21 +146,24 @@ const ChatMessage = ({ message, onClick, onDelete }) => {
                   </>
                 )}
               </button>
-            )}
-            
-            {/* Delete button */}
-            {onDelete && !isError && (
-              <button
-                onClick={onDelete}
-                className="text-xs text-gray-500 hover:text-red-600 flex items-center space-x-1 transition-colors"
-              >
-                <svg className="w-3 h-3" fill="currentColor" viewBox="0 0 20 20">
-                  <path fillRule="evenodd" d="M9 2a1 1 0 00-.894.553L7.382 4H4a1 1 0 000 2v10a2 2 0 002 2h8a2 2 0 002-2V6a1 1 0 100-2h-3.382l-.724-1.447A1 1 0 0011 2H9zM7 8a1 1 0 012 0v6a1 1 0 11-2 0V8zm5-1a1 1 0 00-1 1v6a1 1 0 102 0V8a1 1 0 00-1-1z" clipRule="evenodd" />
-                </svg>
-                <span>Delete</span>
-              </button>
-            )}
-          </div>
+              
+              {/* Delete button */}
+              {onDelete && (
+                <button
+                  onClick={(e) => {
+                    e.stopPropagation();
+                    onDelete();
+                  }}
+                  className="text-xs text-gray-500 hover:text-red-600 flex items-center space-x-1 transition-colors"
+                >
+                  <svg className="w-3 h-3" fill="currentColor" viewBox="0 0 20 20">
+                    <path fillRule="evenodd" d="M9 2a1 1 0 00-.894.553L7.382 4H4a1 1 0 000 2v10a2 2 0 002 2h8a2 2 0 002-2V6a1 1 0 100-2h-3.382l-.724-1.447A1 1 0 0011 2H9zM7 8a1 1 0 012 0v6a1 1 0 11-2 0V8zm5-1a1 1 0 00-1 1v6a1 1 0 102 0V8a1 1 0 00-1-1z" clipRule="evenodd" />
+                  </svg>
+                  <span>Delete</span>
+                </button>
+              )}
+            </div>
+          )}
         </div>
       </div>
     </div>

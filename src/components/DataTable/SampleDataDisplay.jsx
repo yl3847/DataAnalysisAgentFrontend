@@ -2,11 +2,6 @@ import React, { useState, useEffect } from 'react';
 import DataTable from './DataTable';
 
 const SampleDataDisplay = () => {
-  // ============================================
-  // BACKEND INTEGRATION POINT #4: Sample Data
-  // Future: Replace with backend fetch
-  // E.g.: useEffect(() => fetchSampleData(), [])
-  // ============================================
   const sampleData = [
     { applicant_id: 'AID0001', gender: 'Male', age_group: 'Young Adult', race: 'Other', training: 'None', signals: 38.48, yield: 30.29, speed_control: 37.03, night_drive: 33.53, road_signs: 39.61, steer_control: 58.16, mirror_usage: 53.42, confidence: 35.32, parking: 38.19, theory_test: 70.68, reactions: 'Average', qualified: 'No' },
     { applicant_id: 'AID0002', gender: 'Female', age_group: 'Young Adult', race: 'Black', training: 'None', signals: 51.76, yield: 19.13, speed_control: 63.05, night_drive: 34.87, road_signs: 19.56, steer_control: 16.48, mirror_usage: 27.97, confidence: 22.91, parking: 24.23, theory_test: 78.18, reactions: 'Average', qualified: 'No' },
@@ -21,12 +16,6 @@ const SampleDataDisplay = () => {
 
   const [activeTab, setActiveTab] = useState('preview');
 
-  // This could be fetched from backend in the future
-  useEffect(() => {
-    // Future backend integration:
-    // fetchSampleData().then(data => setSampleData(data));
-  }, []);
-
   const getStatistics = () => {
     const stats = {
       totalRecords: sampleData.length,
@@ -37,11 +26,6 @@ const SampleDataDisplay = () => {
         none: sampleData.filter(r => r.training === 'None').length,
         basic: sampleData.filter(r => r.training === 'Basic').length,
         advanced: sampleData.filter(r => r.training === 'Advanced').length,
-      },
-      ageGroups: {
-        teenager: sampleData.filter(r => r.age_group === 'Teenager').length,
-        youngAdult: sampleData.filter(r => r.age_group === 'Young Adult').length,
-        middleAge: sampleData.filter(r => r.age_group === 'Middle Age').length,
       }
     };
     return stats;
@@ -51,11 +35,11 @@ const SampleDataDisplay = () => {
 
   return (
     <div className="sample-data-display h-full flex flex-col">
-      {/* Tab Navigation */}
-      <div className="flex space-x-1 mb-4 border-b border-gray-200">
+      {/* Tab Navigation - Narrower height (40px) */}
+      <div className="flex space-x-1 border-b border-gray-200" style={{ height: '40px' }}>
         <button
           onClick={() => setActiveTab('preview')}
-          className={`px-4 py-2 text-sm font-medium transition-colors ${
+          className={`px-4 text-sm font-medium transition-colors h-full flex items-center ${
             activeTab === 'preview'
               ? 'text-blue-600 border-b-2 border-blue-600'
               : 'text-gray-500 hover:text-gray-700'
@@ -65,7 +49,7 @@ const SampleDataDisplay = () => {
         </button>
         <button
           onClick={() => setActiveTab('statistics')}
-          className={`px-4 py-2 text-sm font-medium transition-colors ${
+          className={`px-4 text-sm font-medium transition-colors h-full flex items-center ${
             activeTab === 'statistics'
               ? 'text-blue-600 border-b-2 border-blue-600'
               : 'text-gray-500 hover:text-gray-700'
@@ -75,7 +59,7 @@ const SampleDataDisplay = () => {
         </button>
         <button
           onClick={() => setActiveTab('schema')}
-          className={`px-4 py-2 text-sm font-medium transition-colors ${
+          className={`px-4 text-sm font-medium transition-colors h-full flex items-center ${
             activeTab === 'schema'
               ? 'text-blue-600 border-b-2 border-blue-600'
               : 'text-gray-500 hover:text-gray-700'
@@ -86,7 +70,7 @@ const SampleDataDisplay = () => {
       </div>
 
       {/* Tab Content */}
-      <div className="flex-1 overflow-auto">
+      <div className="flex-1 overflow-auto pt-4">
         {activeTab === 'preview' && (
           <div>
             <p className="text-sm text-gray-600 mb-4">

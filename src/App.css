@@ -4,9 +4,9 @@
   overflow: hidden;
 }
 
-/* Resize Handle */
-.resize-handle {
-  width: 12px;
+/* Resize Handle Container */
+.resize-handle-container {
+  width: 8px;
   cursor: col-resize;
   position: relative;
   user-select: none;
@@ -15,21 +15,58 @@
   justify-content: center;
 }
 
-.resize-handle:hover .resize-handle-bar,
-.resize-handle.active .resize-handle-bar {
-  background: #cbd5e0;
+/* Resize Handle */
+.resize-handle {
+  width: 100%;
+  height: 60px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  position: relative;
+  transition: all 0.2s;
 }
 
-.resize-handle-bar {
-  width: 4px;
-  height: 40px;
-  background: #e2e8f0;
-  border-radius: 2px;
-  transition: background 0.2s;
+.resize-handle:hover {
+  background: rgba(59, 130, 246, 0.05);
 }
 
 .resize-handle.active {
   background: rgba(59, 130, 246, 0.1);
+}
+
+/* Resize Dots */
+.resize-dots {
+  display: flex;
+  flex-direction: column;
+  gap: 3px;
+  padding: 8px 2px;
+  background: #e5e7eb;
+  border-radius: 4px;
+  transition: all 0.2s;
+}
+
+.resize-dots span {
+  width: 3px;
+  height: 3px;
+  background: #9ca3af;
+  border-radius: 50%;
+  display: block;
+}
+
+.resize-handle:hover .resize-dots {
+  background: #cbd5e0;
+}
+
+.resize-handle:hover .resize-dots span {
+  background: #6b7280;
+}
+
+.resize-handle.active .resize-dots {
+  background: rgba(59, 130, 246, 0.2);
+}
+
+.resize-handle.active .resize-dots span {
+  background: #3b82f6;
 }
 
 /* Scrollbar styles */
@@ -81,27 +118,4 @@
 
 .chat-messages-area::-webkit-scrollbar-thumb:hover {
   background: #9ca3af;
-}
-
-/* Sample prompts styling */
-.sample-prompts {
-  background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
-  -webkit-background-clip: text;
-  -webkit-text-fill-color: transparent;
-  background-clip: text;
-}
-
-/* Model selector */
-.model-selector {
-  background: #f7fafc;
-  border: 1px solid #e2e8f0;
-  border-radius: 8px;
-  padding: 4px 8px;
-  font-size: 12px;
-  transition: all 0.2s;
-}
-
-.model-selector:hover {
-  background: #edf2f7;
-  border-color: #cbd5e0;
 }
