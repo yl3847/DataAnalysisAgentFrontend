@@ -37,4 +37,3 @@ samconfig.toml
 .env*
 !.env.example
 
-deploy.sh
