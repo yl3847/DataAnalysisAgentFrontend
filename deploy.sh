@@ -4,142 +4,219 @@
 RED='\033[0;31m'
 GREEN='\033[0;32m'
 YELLOW='\033[1;33m'
+BLUE='\033[0;34m'
 NC='\033[0m' # No Color
 
+# Configuration
+SOURCE_BRANCH=${1:-main}
+DEPLOY_BRANCH="gh-pages"
+BUILD_DIR="build"
+TEMP_BUILD_DIR="../build-temp"
+
+# Function to print colored output
+print_status() {
+    echo -e "${BLUE}ℹ️  $1${NC}"
+}
+
+print_success() {
+    echo -e "${GREEN}✅ $1${NC}"
+}
+
+print_warning() {
+    echo -e "${YELLOW}⚠️  $1${NC}"
+}
+
+print_error() {
+    echo -e "${RED}❌ $1${NC}"
+}
+
+# Function to cleanup on exit
+cleanup() {
+    print_status "Cleaning up temporary files..."
+    rm -rf "$TEMP_BUILD_DIR" 2>/dev/null || true
+    rm -f "../CNAME-temp" 2>/dev/null || true
+    
+    # Switch back to original branch if we changed
+    if [ "$CURRENT_BRANCH" != "$SOURCE_BRANCH" ] && [ -n "$CURRENT_BRANCH" ]; then
+        git checkout "$CURRENT_BRANCH" 2>/dev/null || true
+    fi
+}
+
+# Set trap to cleanup on script exit
+trap cleanup EXIT
+
 echo -e "${YELLOW}🚀 Starting deployment to GitHub Pages...${NC}"
+print_status "Source branch: $SOURCE_BRANCH"
+print_status "Deploy branch: $DEPLOY_BRANCH"
 
 # Check if we're in the right directory (should have package.json)
 if [ ! -f "package.json" ]; then
-    echo -e "${RED}❌ Error: package.json not found. Make sure you're in the project root directory.${NC}"
+    print_error "package.json not found. Make sure you're in the project root directory."
     exit 1
 fi
 
-# Check if node_modules exists
-if [ ! -d "node_modules" ]; then
-    echo -e "${YELLOW}📦 Installing dependencies...${NC}"
-    npm install
+# Check if git repository exists
+if [ ! -d ".git" ]; then
+    print_error "Not a git repository. Please initialize git first."
+    exit 1
+fi
+
+# Check for uncommitted changes
+if ! git diff-index --quiet HEAD --; then
+    print_error "You have uncommitted changes. Please commit or stash them first."
+    print_status "You can stash changes with: git stash"
+    exit 1
 fi
 
 # Save current branch name
 CURRENT_BRANCH=$(git branch --show-current)
-echo -e "${GREEN}📍 Current branch: $CURRENT_BRANCH${NC}"
+print_status "Current branch: $CURRENT_BRANCH"
 
-# Check for uncommitted changes
-if ! git diff-index --quiet HEAD --; then
-    echo -e "${RED}❌ Error: You have uncommitted changes. Please commit or stash them first.${NC}"
+# Check if source branch exists
+if ! git show-ref --verify --quiet refs/heads/"$SOURCE_BRANCH"; then
+    print_error "Source branch '$SOURCE_BRANCH' does not exist."
     exit 1
 fi
 
-# Make sure we're on main branch for building
-if [ "$CURRENT_BRANCH" != "main" ]; then
-    echo -e "${YELLOW}🔄 Switching to main branch for build...${NC}"
-    git checkout main
+# Check if node_modules exists and is up to date
+if [ ! -d "node_modules" ] || [ "package-lock.json" -nt "node_modules" ]; then
+    print_status "Installing/updating dependencies..."
+    if ! npm ci; then
+        print_error "Failed to install dependencies."
+        exit 1
+    fi
 fi
 
-# Pull latest changes from main
-echo -e "${YELLOW}📥 Pulling latest changes from main...${NC}"
-git pull origin main
+# Make sure we're on the source branch for building
+if [ "$CURRENT_BRANCH" != "$SOURCE_BRANCH" ]; then
+    print_status "Switching to $SOURCE_BRANCH branch for build..."
+    if ! git checkout "$SOURCE_BRANCH"; then
+        print_error "Failed to switch to $SOURCE_BRANCH branch."
+        exit 1
+    fi
+fi
 
-# Build the project from main branch
-echo -e "${YELLOW}📦 Building the project from main branch...${NC}"
-# Use npx to ensure react-scripts is found
-npx react-scripts build
+# Pull latest changes from source branch
+print_status "Pulling latest changes from $SOURCE_BRANCH..."
+if ! git pull origin "$SOURCE_BRANCH"; then
+    print_warning "Failed to pull latest changes. Continuing with current state..."
+fi
+
+# Build the project
+print_status "Building the project..."
+if ! npx react-scripts build; then
+    print_error "Build failed."
+    exit 1
+fi
 
 # Check if build was successful
-if [ ! -d "build" ]; then
-    echo -e "${RED}❌ Error: Build failed. No build directory found.${NC}"
-    # Switch back to original branch if we changed
-    if [ "$CURRENT_BRANCH" != "main" ]; then
-        git checkout $CURRENT_BRANCH
-    fi
+if [ ! -d "$BUILD_DIR" ]; then
+    print_error "Build failed. No build directory found."
     exit 1
 fi
 
-echo -e "${GREEN}✅ Build successful!${NC}"
+print_success "Build successful!"
 
-# Copy build folder to parent directory (temporary location)
-echo -e "${YELLOW}📂 Copying build folder to temporary location...${NC}"
-rm -rf ../build-temp 2>/dev/null || true
-cp -r build ../build-temp
+# Copy build folder to temporary location
+print_status "Copying build folder to temporary location..."
+rm -rf "$TEMP_BUILD_DIR" 2>/dev/null || true
+if ! cp -r "$BUILD_DIR" "$TEMP_BUILD_DIR"; then
+    print_error "Failed to copy build folder."
+    exit 1
+fi
 
 # Check if gh-pages branch exists, create if it doesn't
-if ! git show-ref --verify --quiet refs/heads/gh-pages; then
-    echo -e "${YELLOW}📝 Creating gh-pages branch...${NC}"
-    git checkout --orphan gh-pages
+if ! git show-ref --verify --quiet refs/heads/"$DEPLOY_BRANCH"; then
+    print_status "Creating $DEPLOY_BRANCH branch..."
+    if ! git checkout --orphan "$DEPLOY_BRANCH"; then
+        print_error "Failed to create $DEPLOY_BRANCH branch."
+        exit 1
+    fi
     # Remove all files from the new branch
     git rm -rf . 2>/dev/null || true
     # Create initial commit
     echo "# GitHub Pages" > README.md
     git add README.md
-    git commit -m "Initial gh-pages commit"
-    git push origin gh-pages
-    # Go back to main to continue
-    git checkout main
+    if ! git commit -m "Initial $DEPLOY_BRANCH commit"; then
+        print_error "Failed to create initial commit."
+        exit 1
+    fi
+    if ! git push origin "$DEPLOY_BRANCH"; then
+        print_error "Failed to push initial $DEPLOY_BRANCH branch."
+        exit 1
+    fi
+    # Go back to source branch to continue
+    git checkout "$SOURCE_BRANCH"
 fi
 
 # Switch to gh-pages branch
-echo -e "${YELLOW}🔄 Switching to gh-pages branch...${NC}"
-git checkout gh-pages
+print_status "Switching to $DEPLOY_BRANCH branch..."
+if ! git checkout "$DEPLOY_BRANCH"; then
+    print_error "Failed to switch to $DEPLOY_BRANCH branch."
+    exit 1
+fi
 
 # Pull latest from gh-pages to avoid conflicts
-echo -e "${YELLOW}📥 Pulling latest from gh-pages...${NC}"
-git pull origin gh-pages 2>/dev/null || true
+print_status "Pulling latest from $DEPLOY_BRANCH..."
+git pull origin "$DEPLOY_BRANCH" 2>/dev/null || true
 
-# Remove all existing files except .git and CNAME (if exists)
-echo -e "${YELLOW}🧹 Cleaning gh-pages branch...${NC}"
 # Save CNAME if it exists
 if [ -f "CNAME" ]; then
+    print_status "Preserving CNAME file..."
     cp CNAME ../CNAME-temp
 fi
 
-# Remove everything except .git directory
+# Remove all existing files except .git
+print_status "Cleaning $DEPLOY_BRANCH branch..."
 find . -maxdepth 1 ! -name '.git' ! -name '.' ! -name '..' -exec rm -rf {} +
 
 # Copy build contents to current directory
-echo -e "${YELLOW}📋 Copying build contents to gh-pages branch...${NC}"
-cp -r ../build-temp/* .
+print_status "Copying build contents to $DEPLOY_BRANCH branch..."
+if ! cp -r "$TEMP_BUILD_DIR"/* .; then
+    print_error "Failed to copy build contents."
+    exit 1
+fi
+
 # Copy hidden files if they exist (like .nojekyll)
-cp -r ../build-temp/.[^.]* . 2>/dev/null || true
+cp -r "$TEMP_BUILD_DIR"/.[^.]* . 2>/dev/null || true
 
 # Restore CNAME if it existed
 if [ -f "../CNAME-temp" ]; then
     mv ../CNAME-temp CNAME
+    print_success "CNAME file restored"
 fi
 
 # Create .nojekyll file to bypass Jekyll processing
 touch .nojekyll
 
-# Remove temporary build folder
-rm -rf ../build-temp
-
 # Add all files to git
-echo -e "${YELLOW}📝 Staging changes...${NC}"
-git add -A
+print_status "Staging changes..."
+if ! git add -A; then
+    print_error "Failed to stage changes."
+    exit 1
+fi
 
 # Check if there are changes to commit
 if git diff --staged --quiet; then
-    echo -e "${YELLOW}ℹ️  No changes to deploy.${NC}"
-    git checkout $CURRENT_BRANCH
+    print_warning "No changes to deploy."
     exit 0
 fi
 
 # Commit changes
-echo -e "${YELLOW}💾 Committing changes...${NC}"
-COMMIT_MESSAGE="Deploy to GitHub Pages from main - $(date '+%Y-%m-%d %H:%M:%S')"
-git commit -m "$COMMIT_MESSAGE"
+print_status "Committing changes..."
+COMMIT_MESSAGE="Deploy to GitHub Pages from $SOURCE_BRANCH - $(date '+%Y-%m-%d %H:%M:%S')"
+if ! git commit -m "$COMMIT_MESSAGE"; then
+    print_error "Failed to commit changes."
+    exit 1
+fi
 
 # Push to gh-pages
-echo -e "${YELLOW}📤 Pushing to GitHub Pages...${NC}"
-git push origin gh-pages --force
+print_status "Pushing to GitHub Pages..."
+if ! git push origin "$DEPLOY_BRANCH" --force; then
+    print_error "Failed to push to GitHub Pages."
+    exit 1
+fi
 
-# Switch back to original branch
-echo -e "${YELLOW}🔄 Switching back to $CURRENT_BRANCH branch...${NC}"
-git checkout $CURRENT_BRANCH
-
-echo -e "${GREEN}✅ Deployment successful!${NC}"
-echo -e "${GREEN}🌐 Your site will be available at your GitHub Pages URL${NC}"
-echo -e "${YELLOW}ℹ️  Note: It may take a few minutes for changes to be visible.${NC}"
-
-# Clean up any remaining temp files
-rm -rf ../build-temp 2>/dev/null || true
-rm -f ../CNAME-temp 2>/dev/null || true
+print_success "Deployment successful!"
+print_success "Your site will be available at: https://yl3847.github.io/DataAnalysisAgentFrontend"
+print_warning "Note: It may take a few minutes for changes to be visible."
