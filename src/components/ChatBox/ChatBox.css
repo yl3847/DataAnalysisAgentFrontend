@@ -177,4 +177,17 @@
   .sample-prompt-card p {
     font-size: 0.75rem;
   }
+  
+  /* Mobile textarea styles */
+  .chat-box textarea {
+    font-size: 16px; /* Prevents zoom on iOS */
+    line-height: 1.4;
+    -webkit-overflow-scrolling: touch; /* Smooth scrolling on iOS */
+  }
+  
+  /* Ensure textarea doesn't cause layout issues on mobile */
+  .chat-box form {
+    position: relative;
+    z-index: 10;
+  }
 }
