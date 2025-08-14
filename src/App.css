@@ -4,6 +4,26 @@
   overflow: hidden;
 }
 
+/* Mobile-specific styles */
+@media (max-width: 768px) {
+  .App {
+    -webkit-text-size-adjust: 100%;
+    -webkit-tap-highlight-color: transparent;
+    touch-action: manipulation;
+  }
+  
+  /* Prevent horizontal scrolling on mobile */
+  body {
+    overflow-x: hidden;
+  }
+  
+  /* Ensure proper touch targets */
+  button, [role="button"] {
+    min-height: 44px;
+    min-width: 44px;
+  }
+}
+
 /* Resize Handle Container */
 .resize-handle-container {
   width: 8px;
@@ -13,6 +33,13 @@
   display: flex;
   align-items: center;
   justify-content: center;
+}
+
+/* Hide resize handle on mobile */
+@media (max-width: 768px) {
+  .resize-handle-container {
+    display: none;
+  }
 }
 
 /* Resize Handle */

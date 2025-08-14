@@ -132,3 +132,49 @@
     max-width: 85%;
   }
 }
+
+/* Mobile-specific styles for ChatBox */
+@media (max-width: 768px) {
+  .chat-box {
+    border-radius: 0;
+    box-shadow: none;
+  }
+  
+  .chat-box .border-b {
+    padding-left: 1rem;
+    padding-right: 1rem;
+  }
+  
+  .chat-box .p-4 {
+    padding: 0.75rem;
+  }
+  
+  /* Ensure proper spacing for mobile */
+  .chat-messages-area {
+    padding: 0.75rem;
+  }
+  
+  /* Make buttons more touch-friendly */
+  .chat-box button {
+    min-height: 44px;
+    min-width: 44px;
+  }
+  
+  /* Adjust sample prompts for mobile */
+  .sample-prompts-grid {
+    grid-template-columns: 1fr;
+    gap: 0.5rem;
+  }
+  
+  .sample-prompt-card {
+    padding: 0.75rem;
+  }
+  
+  .sample-prompt-card h4 {
+    font-size: 0.875rem;
+  }
+  
+  .sample-prompt-card p {
+    font-size: 0.75rem;
+  }
+}

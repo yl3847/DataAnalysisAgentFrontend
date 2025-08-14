@@ -18,10 +18,23 @@ function App() {
   const [selectedModel, setSelectedModel] = useState('claude-3-opus');
   const [showUserMenu, setShowUserMenu] = useState(false);
   const [showHelpModal, setShowHelpModal] = useState(false);
+  const [isMobile, setIsMobile] = useState(false);
+  const [mobileView, setMobileView] = useState('chat'); // 'chat' or 'data'
   
   const analysisRefs = useRef({});
   const messageRefs = useRef({});
   const containerRef = useRef(null);
+  
+  // Check if device is mobile
+  useEffect(() => {
+    const checkMobile = () => {
+      setIsMobile(window.innerWidth <= 768);
+    };
+    
+    checkMobile();
+    window.addEventListener('resize', checkMobile);
+    return () => window.removeEventListener('resize', checkMobile);
+  }, []);
   
   // Initialize Google Analytics on app load
   useEffect(() => {
@@ -79,6 +92,83 @@ function App() {
     selectedModel
   });
 
+  // Mobile layout
+  if (isMobile) {
+    return (
+      <div className="App min-h-screen bg-white overflow-hidden">
+        <MainLayout 
+          onUserMenuClick={() => setShowUserMenu(true)}
+          onHelpClick={() => setShowHelpModal(true)}
+        >
+          <div className="px-2 py-2 h-full">
+            {/* Mobile Navigation Tabs */}
+            <div className="flex bg-white rounded-lg shadow-sm mb-2">
+              <button
+                onClick={() => setMobileView('chat')}
+                className={`flex-1 py-3 px-4 text-sm font-medium rounded-l-lg transition-all ${
+                  mobileView === 'chat'
+                    ? 'bg-blue-500 text-white'
+                    : 'text-gray-600 bg-gray-100'
+                }`}
+              >
+                Chat
+              </button>
+              <button
+                onClick={() => setMobileView('data')}
+                className={`flex-1 py-3 px-4 text-sm font-medium rounded-r-lg transition-all ${
+                  mobileView === 'data'
+                    ? 'bg-blue-500 text-white'
+                    : 'text-gray-600 bg-gray-100'
+                }`}
+              >
+                Data
+              </button>
+            </div>
+            
+            {/* Mobile Content */}
+            <div className="h-full" style={{ height: 'calc(100vh - 140px)' }}>
+              {mobileView === 'chat' ? (
+                <ChatPanel
+                  width={100}
+                  messages={messages}
+                  messageRefs={messageRefs}
+                  highlightedMessage={highlightedMessage}
+                  isLoading={isLoading}
+                  selectedModel={selectedModel}
+                  onModelChange={setSelectedModel}
+                  onSendMessage={handleSendMessage}
+                  onMessageClick={scrollToAnalysis}
+                  onDeleteMessage={deleteMessage}
+                  onClearAll={handleClearAll}
+                />
+              ) : (
+                <DataPanel
+                  width={100}
+                  activeView={activeView}
+                  setActiveView={setActiveView}
+                  analysisHistory={analysisHistory}
+                  analysisRefs={analysisRefs}
+                  highlightedAnalysis={highlightedAnalysis}
+                  onAnalysisClick={scrollToMessage}
+                  onDeleteAnalysis={deleteAnalysis}
+                />
+              )}
+            </div>
+          </div>
+        </MainLayout>
+        
+        {showUserMenu && (
+          <UserMenu onClose={() => setShowUserMenu(false)} />
+        )}
+        
+        {showHelpModal && (
+          <HelpModal onClose={() => setShowHelpModal(false)} />
+        )}
+      </div>
+    );
+  }
+
+  // Desktop layout (original)
   return (
     <div className="App min-h-screen bg-white overflow-hidden">
       <MainLayout 
