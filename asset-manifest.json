@@ -1,0 +1,13 @@
+{
+  "files": {
+    "main.css": "/DataAnalysisAgentFrontend/static/css/main.cca93d5b.css",
+    "main.js": "/DataAnalysisAgentFrontend/static/js/main.da54a5af.js",
+    "index.html": "/DataAnalysisAgentFrontend/index.html",
+    "main.cca93d5b.css.map": "/DataAnalysisAgentFrontend/static/css/main.cca93d5b.css.map",
+    "main.da54a5af.js.map": "/DataAnalysisAgentFrontend/static/js/main.da54a5af.js.map"
+  },
+  "entrypoints": [
+    "static/css/main.cca93d5b.css",
+    "static/js/main.da54a5af.js"
+  ]
+}
