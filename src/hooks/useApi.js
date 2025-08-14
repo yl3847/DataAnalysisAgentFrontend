@@ -111,11 +111,34 @@ export const useApi = () => {
         throw new Error(`API request failed: ${response.status} - ${rawText}`);
       }
 
+      // Parse the nested body structure from Lambda response
+      let parsedData = data;
+      if (data.body && typeof data.body === 'string') {
+        try {
+          parsedData = JSON.parse(data.body);
+          console.log('Parsed body data:', parsedData);
+        } catch (bodyParseError) {
+          console.error('Failed to parse body as JSON:', bodyParseError);
+          parsedData = data;
+        }
+      }
+
+      // Extract the actual response data
+      const returnValue = parsedData.returnValue || parsedData;
+      const charts = parsedData.charts || [];
+      const insight = parsedData.insight || {};
+
       return {
         success: true,
-        message: data.result || data.message || 'No message in response',
-        graphUrl: data.graph_url || null,
-        rawResponse: data
+        message: insight.summary || 'Analysis completed',
+        graphUrl: null,
+        rawResponse: data,
+        // Extract the actual data for analysis
+        returnValue: returnValue,
+        charts: charts,
+        insight: insight,
+        rowCount: returnValue.rowCount || 0,
+        data: returnValue.data || []
       };
     } catch (error) {
       console.error('=== API Error Details ===');

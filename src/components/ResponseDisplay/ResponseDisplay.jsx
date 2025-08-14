@@ -2,12 +2,24 @@ import React, { useRef } from 'react';
 import ReactMarkdown from 'react-markdown';
 import { Prism as SyntaxHighlighter } from 'react-syntax-highlighter';
 import { tomorrow } from 'react-syntax-highlighter/dist/esm/styles/prism';
+import ChartRenderer from './ChartRenderer';
 
 const ResponseDisplay = ({ response }) => {
   const components = {
     code({ node, inline, className, children, ...props }) {
       const match = /language-(\w+)/.exec(className || '');
       const content = String(children).replace(/\n$/, '');
+      
+      // Handle chart blocks
+      if (match && match[1] === 'chart' && !inline) {
+        try {
+          const chartConfig = JSON.parse(content.trim());
+          return <ChartRenderer config={chartConfig} />;
+        } catch (e) {
+          console.error('Invalid chart config:', e);
+          // Fall through to render as code if not valid JSON
+        }
+      }
       
       return !inline && match ? (
         <SyntaxHighlighter

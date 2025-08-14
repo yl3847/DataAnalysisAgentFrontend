@@ -110,9 +110,18 @@ export const useAnalysis = ({
     // Add charts
     if (apiResponse.charts && apiResponse.charts.length > 0) {
       markdown += '### Visualizations\n\n';
-      apiResponse.charts.forEach(chart => {
-        markdown += `#### ${chart.chartName.replace(/_/g, ' ')}\n`;
-        markdown += `![${chart.chartName}](${chart.chartUrl})\n\n`;
+      apiResponse.charts.forEach((chart, index) => {
+        const chartTitle = chart.title || (chart.chartName ? chart.chartName.replace(/_/g, ' ') : `Chart ${index + 1}`);
+        if (chart.chartUrl) {
+          markdown += `#### ${chartTitle}\n`;
+          markdown += `![${chartTitle}](${chart.chartUrl})\n\n`;
+        } else if (chart.data) {
+          // For chart data that needs to be rendered by ChartRenderer
+          markdown += `#### ${chartTitle}\n`;
+          markdown += '```chart\n';
+          markdown += JSON.stringify(chart, null, 2);
+          markdown += '\n```\n\n';
+        }
       });
     }
     
@@ -121,15 +130,6 @@ export const useAnalysis = ({
       markdown += '### Key Findings\n';
       apiResponse.insight.keyFindings.forEach(finding => {
         markdown += `- ${finding}\n`;
-      });
-      markdown += '\n';
-    }
-    
-    // Add recommendations
-    if (apiResponse.insight?.recommendations && apiResponse.insight.recommendations.length > 0) {
-      markdown += '### Recommendations\n';
-      apiResponse.insight.recommendations.forEach(rec => {
-        markdown += `- ${rec}\n`;
       });
       markdown += '\n';
     }
@@ -202,11 +202,21 @@ export const useAnalysis = ({
         }
       ]);
 
-      // Create assistant message - only show the user's query
+      // Create assistant message with recommendations
+      let assistantContent = `**Analysis #${analysisNumber}**\n\nYour query: "${message}"\n\nThe analysis result is showed in the left bar.`;
+      
+      // Add recommendations if available
+      if (apiResponse.insight?.recommendations && apiResponse.insight.recommendations.length > 0) {
+        assistantContent += '\n\n**Recommended next steps:**\n';
+        apiResponse.insight.recommendations.forEach((rec, index) => {
+          assistantContent += `${index + 1}. ${rec}\n`;
+        });
+      }
+      
       const assistantMessage = {
         id: Date.now() + 1,
         type: 'assistant',
-        content: `**Analysis #${analysisNumber}**\n\nYour query: "${message}"\n\nThe detailed results are displayed in the Analysis Results panel.`,
+        content: assistantContent,
         timestamp: new Date().toISOString(),
         analysisId: userMessage.id,
         analysisNumber
@@ -225,9 +235,11 @@ export const useAnalysis = ({
         model: selectedModel,
         analysisNumber,
         timestamp: new Date().toISOString(),
-        charts: apiResponse.charts,
-        insight: apiResponse.insight,
-        rowCount: apiResponse.rowCount,
+        charts: apiResponse.charts || [],
+        insight: apiResponse.insight || {},
+        rowCount: apiResponse.rowCount || 0,
+        data: apiResponse.data || [],
+        returnValue: apiResponse.returnValue || {},
         apiResponse: apiResponse.rawResponse
       };
       
