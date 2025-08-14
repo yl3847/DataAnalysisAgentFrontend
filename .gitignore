@@ -36,3 +36,5 @@ samconfig.toml
 # Environment variables
 .env*
 !.env.example
+
+deploy.sh
