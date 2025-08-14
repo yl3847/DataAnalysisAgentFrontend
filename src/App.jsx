@@ -78,13 +78,13 @@ function App() {
   });
 
   return (
-    <div className="App min-h-screen bg-gradient-to-br from-gray-50 to-gray-100 overflow-hidden">
+    <div className="App min-h-screen bg-white overflow-hidden">
       <MainLayout onUserMenuClick={() => setShowUserMenu(true)}>
-        <div className="container mx-auto px-4 py-4 h-full">
+        <div className="px-[2%] py-2 h-full">
           <div 
             ref={containerRef}
             className="flex gap-2 h-full" 
-            style={{ height: 'calc(100vh - 140px)' }}
+            style={{ height: 'calc(100vh - 90px)' }}
           >
             
             {/* Left Panel - Data/Analysis View */}

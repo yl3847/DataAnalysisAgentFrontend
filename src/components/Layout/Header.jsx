@@ -27,28 +27,10 @@ const Header = ({ onUserMenuClick }) => {
     return () => clearInterval(interval);
   }, []);
 
-  const getStatusColor = () => {
-    switch (connectionStatus) {
-      case 'connected': return 'bg-green-500';
-      case 'mock': return 'bg-yellow-500';
-      case 'disconnected': return 'bg-red-500';
-      default: return 'bg-gray-500';
-    }
-  };
-
-  const getStatusText = () => {
-    switch (connectionStatus) {
-      case 'connected': return 'Connected to AWS';
-      case 'mock': return 'Using Mock Data';
-      case 'disconnected': return 'Disconnected';
-      default: return 'Unknown';
-    }
-  };
-
   return (
     <header className="bg-white shadow-md border-b border-gray-200">
-      <div className="container mx-auto px-4">
-        <div className="flex items-center justify-between h-16">
+      <div className="px-[2%]">
+        <div className="flex items-center justify-between h-12">
           <div className="flex items-center space-x-4">
             <div className="flex items-center">
               <svg
@@ -68,17 +50,9 @@ const Header = ({ onUserMenuClick }) => {
                 Data Analytics Chatbot
               </h1>
             </div>
-            <span className="text-sm text-gray-500 hidden sm:inline">
-              Powered by AWS MCP Server
-            </span>
           </div>
           
           <div className="flex items-center space-x-4">
-            <div className="flex items-center space-x-2">
-              <div className={`h-2 w-2 rounded-full ${getStatusColor()} animate-pulse`}></div>
-              <span className="text-sm text-gray-600">{getStatusText()}</span>
-            </div>
-            
             <button
               onClick={onUserMenuClick}
               className="p-2 rounded-lg hover:bg-gray-100 transition-colors"

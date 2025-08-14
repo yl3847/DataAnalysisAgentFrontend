@@ -17,9 +17,9 @@ const DataPanel = ({
       className="h-full overflow-hidden"
       style={{ width: `${width}%` }}
     >
-      <div className="bg-white rounded-2xl shadow-lg h-full flex flex-col overflow-hidden">
+      <div className="bg-white rounded-lg shadow-lg h-full flex flex-col overflow-hidden">
         {/* Tab Navigation */}
-        <div className="border-b px-6 py-4 flex-shrink-0" style={{ height: '73px' }}>
+        <div className="border-b px-6 py-3 flex-shrink-0" style={{ height: '60px' }}>
           <div className="flex items-center justify-between h-full">
             <div className="flex space-x-1">
               <button

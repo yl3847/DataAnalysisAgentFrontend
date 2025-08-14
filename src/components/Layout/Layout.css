@@ -20,22 +20,6 @@
   z-index: 1;
 }
 
-/* Header Animations */
-@keyframes slideDown {
-  from {
-    transform: translateY(-100%);
-    opacity: 0;
-  }
-  to {
-    transform: translateY(0);
-    opacity: 1;
-  }
-}
-
-header {
-  animation: slideDown 0.5s ease-out;
-}
-
 /* Responsive adjustments */
 @media (max-width: 768px) {
   .main-layout {

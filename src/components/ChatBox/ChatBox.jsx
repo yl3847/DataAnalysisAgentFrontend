@@ -54,9 +54,9 @@ const ChatBox = ({
   ];
 
   return (
-    <div className="bg-white rounded-2xl shadow-lg h-full flex flex-col overflow-hidden">
+    <div className="bg-white rounded-lg shadow-lg h-full flex flex-col overflow-hidden">
       {/* Fixed Header */}
-      <div className="border-b px-6 py-4 flex justify-between items-center flex-shrink-0" style={{ height: '73px' }}>
+      <div className="border-b px-6 py-3 flex justify-between items-center flex-shrink-0" style={{ height: '60px' }}>
         <h2 className="text-lg font-semibold text-gray-800">
           Analytics Chat
         </h2>
@@ -69,7 +69,7 @@ const ChatBox = ({
       </div>
 
       {/* Model Selector - Matching narrower data tabs with padding */}
-      <div className="border-b bg-gray-50 flex-shrink-0 px-4 flex items-center" style={{ height: '64px' }}>
+      <div className="border-b bg-gray-50 flex-shrink-0 px-4 flex items-center" style={{ height: '56px' }}>
         <ModelSelector 
           selectedModel={selectedModel}
           onModelChange={onModelChange}
@@ -81,7 +81,7 @@ const ChatBox = ({
         ref={messagesContainerRef}
         className="flex-1 overflow-y-auto p-4 space-y-3 chat-messages-area"
         style={{ 
-          maxHeight: 'calc(100% - 181px)', // 73px header + 48px model selector + 60px input
+          maxHeight: 'calc(100% - 172px)', // 60px header + 56px model selector + 56px input
           minHeight: 0 
         }}
       >
@@ -170,7 +170,7 @@ const ChatBox = ({
       </div>
 
       {/* Input Area - Fixed at Bottom */}
-      <div className="border-t bg-gray-50 flex-shrink-0" style={{ height: '60px' }}>
+      <div className="border-t bg-gray-50 flex-shrink-0" style={{ height: '56px' }}>
         <ChatInput 
           onSendMessage={onSendMessage} 
           disabled={isLoading}

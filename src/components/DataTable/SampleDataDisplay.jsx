@@ -1,4 +1,4 @@
-import React, { useState, useEffect } from 'react';
+import React from 'react';
 import DataTable from './DataTable';
 
 const SampleDataDisplay = () => {
@@ -13,8 +13,6 @@ const SampleDataDisplay = () => {
     { applicant_id: 'AID0008', gender: 'Male', age_group: 'Young Adult', race: 'Other', training: 'Basic', signals: 28.47, yield: 31.45, speed_control: 58.16, night_drive: 61.68, road_signs: 46.11, steer_control: 50.70, mirror_usage: 42.56, confidence: 38.97, parking: 31.64, theory_test: 92.37, reactions: 'Average', qualified: 'Yes' },
     { applicant_id: 'AID0009', gender: 'Male', age_group: 'Young Adult', race: 'Other', training: 'None', signals: 35.59, yield: 41.80, speed_control: 45.71, night_drive: 32.72, road_signs: 10.09, steer_control: 34.31, mirror_usage: 27.35, confidence: 36.64, parking: 31.94, theory_test: 64.57, reactions: 'Slow', qualified: 'No' },
   ];
-
-  const [activeTab, setActiveTab] = useState('preview');
 
   const getStatistics = () => {
     const stats = {
@@ -35,91 +33,106 @@ const SampleDataDisplay = () => {
 
   return (
     <div className="sample-data-display h-full flex flex-col">
-      {/* Tab Navigation - Narrower height (40px) */}
-      <div className="flex space-x-1 border-b border-gray-200" style={{ height: '40px' }}>
-        <button
-          onClick={() => setActiveTab('preview')}
-          className={`px-4 text-sm font-medium transition-colors h-full flex items-center ${
-            activeTab === 'preview'
-              ? 'text-blue-600 border-b-2 border-blue-600'
-              : 'text-gray-500 hover:text-gray-700'
-          }`}
-        >
-          Data Preview
-        </button>
-        <button
-          onClick={() => setActiveTab('statistics')}
-          className={`px-4 text-sm font-medium transition-colors h-full flex items-center ${
-            activeTab === 'statistics'
-              ? 'text-blue-600 border-b-2 border-blue-600'
-              : 'text-gray-500 hover:text-gray-700'
-          }`}
-        >
-          Statistics
-        </button>
-        <button
-          onClick={() => setActiveTab('schema')}
-          className={`px-4 text-sm font-medium transition-colors h-full flex items-center ${
-            activeTab === 'schema'
-              ? 'text-blue-600 border-b-2 border-blue-600'
-              : 'text-gray-500 hover:text-gray-700'
-          }`}
-        >
-          Schema
-        </button>
+      {/* Title */}
+      <div className="mb-4">
+        <h2 className="text-xl font-bold text-gray-800 mb-2">
+          Driver License Application Dataset
+        </h2>
       </div>
 
-      {/* Tab Content */}
-      <div className="flex-1 overflow-auto pt-4">
-        {activeTab === 'preview' && (
-          <div>
-            <p className="text-sm text-gray-600 mb-4">
-              Driver License Application Dataset - {sampleData.length} records
-            </p>
-            <DataTable data={sampleData} maxRows={10} />
-          </div>
-        )}
+      {/* Data Preview */}
+      <div className="mb-6">
+        <h3 className="text-lg font-semibold text-gray-700 mb-3">Data Preview</h3>
+        <DataTable data={sampleData.slice(0, 5)} maxRows={5} />
+      </div>
 
-        {activeTab === 'statistics' && (
-          <div className="grid grid-cols-2 gap-4">
-            <div className="bg-blue-50 p-4 rounded-lg">
-              <div className="text-2xl font-bold text-blue-600">{stats.totalRecords}</div>
-              <div className="text-sm text-gray-600">Total Applicants</div>
-            </div>
-            <div className="bg-green-50 p-4 rounded-lg">
-              <div className="text-2xl font-bold text-green-600">
-                {stats.qualifiedCount}/{stats.notQualifiedCount}
+      {/* Statistics */}
+      <div>
+        <h3 className="text-lg font-semibold text-gray-700 mb-3">Statistics</h3>
+        
+        {/* Qualification Status */}
+        <div className="bg-white border border-gray-200 rounded-lg p-4 mb-4">
+          <h4 className="text-sm font-semibold text-gray-700 mb-3">Qualification Status</h4>
+          <div className="flex items-center space-x-4 mb-3">
+            <div className="flex-1">
+              <div className="flex justify-between text-sm mb-1">
+                <span className="text-green-600 font-medium">Qualified</span>
+                <span className="text-gray-600">{stats.qualifiedCount}</span>
               </div>
-              <div className="text-sm text-gray-600">Qualified/Not Qualified</div>
-            </div>
-            <div className="bg-purple-50 p-4 rounded-lg">
-              <div className="text-2xl font-bold text-purple-600">{stats.avgTheoryTest}%</div>
-              <div className="text-sm text-gray-600">Avg Theory Test Score</div>
-            </div>
-            <div className="bg-yellow-50 p-4 rounded-lg">
-              <div className="text-lg font-bold text-yellow-600">
-                {stats.trainingTypes.none}/{stats.trainingTypes.basic}/{stats.trainingTypes.advanced}
+              <div className="w-full bg-gray-200 rounded-full h-2">
+                <div 
+                  className="bg-green-500 h-2 rounded-full transition-all duration-500"
+                  style={{ width: `${(stats.qualifiedCount / stats.totalRecords) * 100}%` }}
+                ></div>
               </div>
-              <div className="text-sm text-gray-600">None/Basic/Advanced Training</div>
+            </div>
+            <div className="flex-1">
+              <div className="flex justify-between text-sm mb-1">
+                <span className="text-red-600 font-medium">Not Qualified</span>
+                <span className="text-gray-600">{stats.notQualifiedCount}</span>
+              </div>
+              <div className="w-full bg-gray-200 rounded-full h-2">
+                <div 
+                  className="bg-red-500 h-2 rounded-full transition-all duration-500"
+                  style={{ width: `${(stats.notQualifiedCount / stats.totalRecords) * 100}%` }}
+                ></div>
+              </div>
             </div>
           </div>
-        )}
+        </div>
 
-        {activeTab === 'schema' && (
-          <div className="space-y-2">
-            <div className="text-sm font-medium text-gray-700 mb-3">Dataset Schema</div>
-            {Object.keys(sampleData[0]).map((field) => (
-              <div key={field} className="flex items-center justify-between py-2 px-3 bg-gray-50 rounded">
-                <span className="text-sm font-medium text-gray-700">
-                  {field.replace(/_/g, ' ').replace(/\b\w/g, l => l.toUpperCase())}
-                </span>
-                <span className="text-xs text-gray-500 bg-white px-2 py-1 rounded">
-                  {typeof sampleData[0][field]}
-                </span>
+        {/* Training Distribution */}
+        <div className="bg-white border border-gray-200 rounded-lg p-4 mb-4">
+          <h4 className="text-sm font-semibold text-gray-700 mb-3">Training Distribution</h4>
+          <div className="space-y-3">
+            <div className="flex items-center justify-between">
+              <div className="flex items-center space-x-2">
+                <div className="w-3 h-3 bg-gray-400 rounded-full"></div>
+                <span className="text-sm text-gray-600">No Training</span>
               </div>
-            ))}
+              <div className="flex items-center space-x-2">
+                <span className="text-sm font-medium">{stats.trainingTypes.none}</span>
+                <span className="text-xs text-gray-500">({Math.round((stats.trainingTypes.none / stats.totalRecords) * 100)}%)</span>
+              </div>
+            </div>
+            <div className="flex items-center justify-between">
+              <div className="flex items-center space-x-2">
+                <div className="w-3 h-3 bg-blue-400 rounded-full"></div>
+                <span className="text-sm text-gray-600">Basic Training</span>
+              </div>
+              <div className="flex items-center space-x-2">
+                <span className="text-sm font-medium">{stats.trainingTypes.basic}</span>
+                <span className="text-xs text-gray-500">({Math.round((stats.trainingTypes.basic / stats.totalRecords) * 100)}%)</span>
+              </div>
+            </div>
+            <div className="flex items-center justify-between">
+              <div className="flex items-center space-x-2">
+                <div className="w-3 h-3 bg-purple-400 rounded-full"></div>
+                <span className="text-sm text-gray-600">Advanced Training</span>
+              </div>
+              <div className="flex items-center space-x-2">
+                <span className="text-sm font-medium">{stats.trainingTypes.advanced}</span>
+                <span className="text-xs text-gray-500">({Math.round((stats.trainingTypes.advanced / stats.totalRecords) * 100)}%)</span>
+              </div>
+            </div>
           </div>
-        )}
+        </div>
+
+        {/* Average Theory Test Score */}
+        <div className="bg-gradient-to-r from-emerald-500 to-teal-600 text-white p-4 rounded-lg">
+          <div className="text-center">
+            <div className="text-3xl font-bold mb-1">{stats.avgTheoryTest}%</div>
+            <div className="text-emerald-100 text-sm">Average Theory Test Score</div>
+            <div className="mt-3">
+              <div className="w-full bg-emerald-400 bg-opacity-30 rounded-full h-2">
+                <div 
+                  className="bg-white h-2 rounded-full transition-all duration-500"
+                  style={{ width: `${stats.avgTheoryTest}%` }}
+                ></div>
+              </div>
+            </div>
+          </div>
+        </div>
       </div>
     </div>
   );

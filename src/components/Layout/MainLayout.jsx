@@ -9,7 +9,7 @@ const MainLayout = ({ children, onUserMenuClick }) => {
       <main className="flex-1 overflow-hidden">
         {children}
       </main>
-      <footer className="bg-gray-800 text-white text-center py-2 text-sm">
+      <footer className="bg-gray-800 text-white text-center py-1 text-xs">
         © 2025 DSAgent. All rights reserved.
       </footer>
     </div>
