@@ -106,7 +106,7 @@
 import axios from 'axios';
 
 // --- Hardcoded backend for initial local integration ---
-const LAMBDA_URL = 'https://e75ohlwotf.execute-api.us-east-1.amazonaws.com/prod/agent';
+const LAMBDA_URL = 'https://xc6ic2ij7l.execute-api.us-east-1.amazonaws.com/prod/agent';
 const API_KEY = 'R79YXWKV5m1DUjqLDDmSQ7VPwYUBwC631j52Qp3J';
 
 // Helper to shape payload into the Lambda contract
