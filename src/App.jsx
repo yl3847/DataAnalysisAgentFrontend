@@ -8,7 +8,7 @@ import ResizeHandle from './components/ResizeHandle/ResizeHandle';
 import { useLocalStorage } from './hooks/useLocalStorage';
 import { useAnalysis } from './hooks/useAnalysis';
 import { usePanelResize } from './hooks/usePanelResize';
-import { initGA, trackPageView, trackUserOrigin } from './utils/analytics';
+import { initGA, trackPageView, trackUserOrigin, trackEvent } from './utils/analytics';
 
 function App() {
   const [messages, setMessages] = useLocalStorage('chat-messages', []);
