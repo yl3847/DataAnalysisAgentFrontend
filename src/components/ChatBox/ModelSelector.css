@@ -1,0 +1,36 @@
+.model-dropdown-enter {
+  opacity: 0;
+  transform: translateY(10px) scale(0.95);
+}
+
+.model-dropdown-enter-active {
+  opacity: 1;
+  transform: translateY(0) scale(1);
+  transition: opacity 200ms ease-out, transform 200ms ease-out;
+}
+
+.model-dropdown-exit {
+  opacity: 1;
+  transform: translateY(0) scale(1);
+}
+
+.model-dropdown-exit-active {
+  opacity: 0;
+  transform: translateY(10px) scale(0.95);
+  transition: opacity 150ms ease-in, transform 150ms ease-in;
+}
+
+.model-dropdown {
+  animation: slideInFromTop 0.2s ease-out;
+}
+
+@keyframes slideInFromTop {
+  from {
+    opacity: 0;
+    transform: translateY(-10px) scale(0.95);
+  }
+  to {
+    opacity: 1;
+    transform: translateY(0) scale(1);
+  }
+}

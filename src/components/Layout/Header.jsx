@@ -1,6 +1,6 @@
 import React from 'react';
 
-const Header = ({ onUserMenuClick }) => {
+const Header = ({ onUserMenuClick, onHelpClick }) => {
   const [connectionStatus, setConnectionStatus] = React.useState('connected');
 
   React.useEffect(() => {
@@ -27,6 +27,8 @@ const Header = ({ onUserMenuClick }) => {
     return () => clearInterval(interval);
   }, []);
 
+
+
   return (
     <header className="bg-white shadow-md border-b border-gray-200">
       <div className="px-[2%]">
@@ -52,7 +54,7 @@ const Header = ({ onUserMenuClick }) => {
             </div>
           </div>
           
-          <div className="flex items-center space-x-4">
+          <div className="flex items-center space-x-4 relative">
             <button
               onClick={onUserMenuClick}
               className="p-2 rounded-lg hover:bg-gray-100 transition-colors"
@@ -69,6 +71,25 @@ const Header = ({ onUserMenuClick }) => {
                   strokeLinejoin="round"
                   strokeWidth={2}
                   d="M5.121 17.804A13.937 13.937 0 0112 16c2.5 0 4.847.655 6.879 1.804M15 10a3 3 0 11-6 0 3 3 0 016 0zm6 2a9 9 0 11-18 0 9 9 0 0118 0z"
+                />
+              </svg>
+            </button>
+            <button
+              onClick={onHelpClick}
+              className="p-2 rounded-lg hover:bg-gray-100 transition-colors"
+              title="Help"
+            >
+              <svg
+                className="h-6 w-6 text-gray-600"
+                fill="none"
+                viewBox="0 0 24 24"
+                stroke="currentColor"
+              >
+                <path
+                  strokeLinecap="round"
+                  strokeLinejoin="round"
+                  strokeWidth={2}
+                  d="M13 16h-1v-4h-1m1-4h.01M21 12a9 9 0 11-18 0 9 9 0 0118 0z"
                 />
               </svg>
             </button>

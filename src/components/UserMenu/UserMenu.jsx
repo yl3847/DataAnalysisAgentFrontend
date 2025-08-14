@@ -39,12 +39,6 @@ const UserMenu = ({ onClose }) => {
           >
             Preferences
           </button>
-          <button
-            onClick={() => setActiveTab('api')}
-            className={`tab ${activeTab === 'api' ? 'active' : ''}`}
-          >
-            API Settings
-          </button>
         </div>
 
         <div className="user-menu-content">
@@ -62,20 +56,20 @@ const UserMenu = ({ onClose }) => {
               </div>
               
               <div className="border-t pt-4">
-                <h4 className="font-medium mb-3">Account Information</h4>
-                <div className="space-y-2">
-                  <div className="flex justify-between py-2">
-                    <span className="text-sm text-gray-600">Usage This Month</span>
-                    <span className="text-sm font-medium">2,450 queries</span>
+                <h4 className="font-medium mb-3">Token Usage</h4>
+                <div className="space-y-3">
+                  <div>
+                    <div className="flex justify-between text-sm mb-1">
+                      <span className="text-gray-600">Remaining Tokens</span>
+                      <span className="font-medium">8,450 / 10,000</span>
+                    </div>
+                    <div className="w-full bg-gray-200 rounded-full h-2">
+                      <div className="bg-gradient-to-r from-green-400 to-blue-500 h-2 rounded-full" style={{ width: '84.5%' }}></div>
+                    </div>
                   </div>
-                  <div className="flex justify-between py-2">
-                    <span className="text-sm text-gray-600">Storage Used</span>
-                    <span className="text-sm font-medium">1.2 GB / 5 GB</span>
-                  </div>
-                  <div className="flex justify-between py-2">
-                    <span className="text-sm text-gray-600">API Calls</span>
-                    <span className="text-sm font-medium">15,234</span>
-                  </div>
+                  <button className="w-full py-2 px-4 bg-gradient-to-r from-blue-500 to-purple-600 text-white rounded-lg hover:from-blue-600 hover:to-purple-700 transition-all duration-200 font-medium">
+                    Add Tokens
+                  </button>
                 </div>
               </div>
             </div>
@@ -87,18 +81,6 @@ const UserMenu = ({ onClose }) => {
                 <label className="flex items-center justify-between py-2">
                   <span className="text-sm font-medium">Dark Mode</span>
                   <input type="checkbox" className="toggle" />
-                </label>
-              </div>
-              <div>
-                <label className="flex items-center justify-between py-2">
-                  <span className="text-sm font-medium">Auto-save Analysis</span>
-                  <input type="checkbox" className="toggle" defaultChecked />
-                </label>
-              </div>
-              <div>
-                <label className="flex items-center justify-between py-2">
-                  <span className="text-sm font-medium">Show Tooltips</span>
-                  <input type="checkbox" className="toggle" defaultChecked />
                 </label>
               </div>
               <div>
@@ -115,45 +97,7 @@ const UserMenu = ({ onClose }) => {
             </div>
           )}
 
-          {activeTab === 'api' && (
-            <div className="space-y-4">
-              <div>
-                <label className="block mb-2">
-                  <span className="text-sm font-medium">API Endpoint</span>
-                  <input 
-                    type="text" 
-                    className="mt-1 w-full px-3 py-2 border border-gray-300 rounded-lg"
-                    defaultValue={process.env.REACT_APP_LAMBDA_URL || ''}
-                    placeholder="https://your-lambda-url.amazonaws.com"
-                  />
-                </label>
-              </div>
-              <div>
-                <label className="block mb-2">
-                  <span className="text-sm font-medium">API Key</span>
-                  <input 
-                    type="password" 
-                    className="mt-1 w-full px-3 py-2 border border-gray-300 rounded-lg"
-                    placeholder="••••••••••••••••"
-                  />
-                </label>
-              </div>
-              <div>
-                <label className="block mb-2">
-                  <span className="text-sm font-medium">Region</span>
-                  <select className="mt-1 w-full px-3 py-2 border border-gray-300 rounded-lg">
-                    <option>us-east-1</option>
-                    <option>us-west-2</option>
-                    <option>eu-west-1</option>
-                    <option>ap-southeast-1</option>
-                  </select>
-                </label>
-              </div>
-              <button className="w-full py-2 bg-blue-600 text-white rounded-lg hover:bg-blue-700 transition-colors">
-                Test Connection
-              </button>
-            </div>
-          )}
+
         </div>
 
         <div className="user-menu-footer">

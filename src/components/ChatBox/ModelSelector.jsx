@@ -1,4 +1,5 @@
 import React, { useState } from 'react';
+import './ModelSelector.css';
 
 const ModelSelector = ({ selectedModel, onModelChange }) => {
   const [isOpen, setIsOpen] = useState(false);
@@ -35,37 +36,34 @@ const ModelSelector = ({ selectedModel, onModelChange }) => {
   ];
 
   const currentModel = models.find(m => m.id === selectedModel) || models[0];
+  
+  // Get short name for display
+  const getShortName = (name) => {
+    if (name.includes('Claude')) return 'Claude';
+    if (name.includes('GPT')) return 'GPT';
+    return name;
+  };
 
   return (
     <div className="relative w-full">
       <button
         onClick={() => setIsOpen(!isOpen)}
-        className="flex items-center space-x-3 w-full px-3 py-1.5 bg-gradient-to-r from-gray-50 to-gray-100 border border-gray-200 rounded-lg hover:from-gray-100 hover:to-gray-150 transition-all text-sm group"
-        style={{ height: '55px' }} // Fixed height smaller than tabs
+        className="flex items-center space-x-2 px-3 py-2 bg-white border border-gray-300 rounded-lg hover:border-blue-400 hover:bg-gray-50 transition-all text-sm group focus:outline-none focus:ring-2 focus:ring-blue-200 w-full"
+        style={{ height: '40px' }} // Match input height
       >
-        <div className="flex items-center flex-1 min-w-0">
-          <span className="text-base mr-2 flex-shrink-0">{currentModel.icon}</span>
-          <div className="flex flex-col justify-center min-w-0 flex-1">
-            <span className="font-medium text-gray-800 truncate text-left">{currentModel.name}</span>
-            <span className="text-xs text-gray-500 truncate text-left">{currentModel.description}</span>
-          </div>
-        </div>
-        <div className="flex items-center space-x-2 flex-shrink-0">
-          <span className="px-2 py-0.5 bg-gradient-to-r from-blue-500 to-blue-600 text-white text-xs rounded-full font-medium whitespace-nowrap">
-            {currentModel.badge}
-          </span>
-          <svg className={`w-4 h-4 text-gray-400 transition-transform flex-shrink-0 ${isOpen ? 'rotate-180' : ''}`}
-               fill="none" viewBox="0 0 24 24" stroke="currentColor">
-            <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M19 9l-7 7-7-7" />
-          </svg>
-        </div>
+        <span className="text-sm flex-shrink-0">{currentModel.icon}</span>
+        <span className="font-medium text-gray-700 truncate flex-1">{getShortName(currentModel.name)}</span>
+        <svg className={`w-3 h-3 text-gray-400 transition-transform flex-shrink-0 ${isOpen ? 'rotate-180' : ''}`}
+             fill="none" viewBox="0 0 24 24" stroke="currentColor">
+          <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M19 9l-7 7-7-7" />
+        </svg>
       </button>
 
       {isOpen && (
         <>
           <div className="fixed inset-0 z-40" onClick={() => setIsOpen(false)} />
-          <div className="absolute top-full left-0 right-0 mt-2 bg-white border border-gray-200 rounded-xl shadow-xl z-50 overflow-hidden">
-            <div className="p-2">
+          <div className="absolute bottom-full left-0 mb-1 bg-white border border-gray-200 rounded-lg shadow-xl z-50 overflow-hidden min-w-64 model-dropdown">
+            <div className="py-1">
               {models.map(model => (
                 <button
                   key={model.id}
@@ -73,18 +71,18 @@ const ModelSelector = ({ selectedModel, onModelChange }) => {
                     onModelChange(model.id);
                     setIsOpen(false);
                   }}
-                  className={`w-full flex items-center space-x-3 px-3 py-2.5 rounded-lg hover:bg-gray-50 transition-all ${
-                    model.id === selectedModel ? 'bg-gradient-to-r from-blue-50 to-blue-100' : ''
+                  className={`w-full flex items-center space-x-3 px-3 py-2 hover:bg-gray-50 transition-all duration-150 ${
+                    model.id === selectedModel ? 'bg-blue-50 border-l-2 border-blue-500' : ''
                   }`}
                 >
-                  <span className="text-lg flex-shrink-0">{model.icon}</span>
+                  <span className="text-sm flex-shrink-0">{model.icon}</span>
                   <div className="flex-1 text-left min-w-0">
-                    <div className="font-medium text-gray-800">{model.name}</div>
+                    <div className="font-medium text-gray-800 text-sm">{model.name}</div>
                     <div className="text-xs text-gray-500">{model.description}</div>
                   </div>
                   <span className={`px-2 py-0.5 text-xs rounded-full font-medium flex-shrink-0 ${
                     model.id === selectedModel
-                      ? 'bg-gradient-to-r from-blue-500 to-blue-600 text-white'
+                      ? 'bg-blue-500 text-white'
                       : 'bg-gray-100 text-gray-600'
                   }`}>
                     {model.badge}

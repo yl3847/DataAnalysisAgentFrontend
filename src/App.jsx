@@ -4,6 +4,7 @@ import MainLayout from './components/Layout/MainLayout';
 import DataPanel from './components/DataPanel/DataPanel';
 import ChatPanel from './components/ChatPanel/ChatPanel';
 import UserMenu from './components/UserMenu/UserMenu';
+import HelpModal from './components/HelpModal/HelpModal';
 import ResizeHandle from './components/ResizeHandle/ResizeHandle';
 import { useLocalStorage } from './hooks/useLocalStorage';
 import { useAnalysis } from './hooks/useAnalysis';
@@ -16,6 +17,7 @@ function App() {
   const [activeView, setActiveView] = useState('data');
   const [selectedModel, setSelectedModel] = useState('claude-3-opus');
   const [showUserMenu, setShowUserMenu] = useState(false);
+  const [showHelpModal, setShowHelpModal] = useState(false);
   
   const analysisRefs = useRef({});
   const messageRefs = useRef({});
@@ -79,7 +81,10 @@ function App() {
 
   return (
     <div className="App min-h-screen bg-white overflow-hidden">
-      <MainLayout onUserMenuClick={() => setShowUserMenu(true)}>
+      <MainLayout 
+        onUserMenuClick={() => setShowUserMenu(true)}
+        onHelpClick={() => setShowHelpModal(true)}
+      >
         <div className="px-[2%] py-2 h-full">
           <div 
             ref={containerRef}
@@ -126,6 +131,10 @@ function App() {
       
       {showUserMenu && (
         <UserMenu onClose={() => setShowUserMenu(false)} />
+      )}
+      
+      {showHelpModal && (
+        <HelpModal onClose={() => setShowHelpModal(false)} />
       )}
     </div>
   );

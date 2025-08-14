@@ -1,4 +1,4 @@
-import React, { useState, useRef, useEffect } from 'react';
+import React, { useState, useRef } from 'react';
 
 const ChatInput = ({ onSendMessage, disabled, compact = false }) => {
   const [message, setMessage] = useState('');
@@ -32,6 +32,7 @@ const ChatInput = ({ onSendMessage, disabled, compact = false }) => {
           className="flex-1 px-3 py-2 rounded-lg border border-gray-300 focus:border-blue-500 focus:ring-1 focus:ring-blue-200 transition-all duration-200 disabled:bg-gray-100 disabled:cursor-not-allowed text-sm"
         />
         
+        {/* Send Button */}
         <button
           type="submit"
           disabled={!message.trim() || disabled}

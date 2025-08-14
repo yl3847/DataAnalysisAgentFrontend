@@ -1,7 +1,6 @@
 import React, { useRef, useEffect } from 'react';
 import ChatInput from './ChatInput';
 import ChatMessage from './ChatMessage';
-import ModelSelector from './ModelSelector';
 import './ChatBox.css';
 
 const ChatBox = ({ 
@@ -68,20 +67,14 @@ const ChatBox = ({
         </button>
       </div>
 
-      {/* Model Selector - Matching narrower data tabs with padding */}
-      <div className="border-b bg-gray-50 flex-shrink-0 px-4 flex items-center" style={{ height: '56px' }}>
-        <ModelSelector 
-          selectedModel={selectedModel}
-          onModelChange={onModelChange}
-        />
-      </div>
+
 
       {/* Messages Area - Properly calculated to prevent overlapping */}
       <div 
         ref={messagesContainerRef}
         className="flex-1 overflow-y-auto p-4 space-y-3 chat-messages-area"
         style={{ 
-          maxHeight: 'calc(100% - 172px)', // 60px header + 56px model selector + 56px input
+          maxHeight: 'calc(100% - 116px)', // 60px header + 56px input
           minHeight: 0 
         }}
       >
