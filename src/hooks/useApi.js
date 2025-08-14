@@ -58,7 +58,7 @@
 //   };
 // };
 const API_ENDPOINT = 'https://xc6ic2ij7l.execute-api.us-east-1.amazonaws.com/prod/agent';
-const API_KEY = '7cXyOnE3E55oPAVTuqkc16kDmtjAWkMj5BVge063';
+const API_KEY = 'gRpxDGL8To3sFrP2CMMuTaOB376rHz1C6ozOZFAd';
 
 export const useApi = () => {
   const sendQuery = async (userInput, chatHistory = []) => {
