@@ -84,7 +84,7 @@ function App() {
           <div 
             ref={containerRef}
             className="flex gap-2 h-full" 
-            style={{ height: 'calc(100vh - 100px)' }}
+            style={{ height: 'calc(100vh - 140px)' }}
           >
             
             {/* Left Panel - Data/Analysis View */}

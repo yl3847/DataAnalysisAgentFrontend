@@ -3,6 +3,7 @@
   "version": "0.1.0",
   "homepage": "https://yl3847.github.io/DataAnalysisAgentFrontend",
   "private": true,
+  "copyright": "© 2025 DSAgent. All rights reserved.",
   "dependencies": {
     "@ant-design/charts": "^2.0.0",
     "@testing-library/jest-dom": "^5.17.0",
