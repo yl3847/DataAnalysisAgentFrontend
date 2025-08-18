@@ -17,7 +17,7 @@ function App() {
   const [activeView, setActiveView] = useState('data');
   const [selectedModel, setSelectedModel] = useState('claude-3-opus');
   const [showUserMenu, setShowUserMenu] = useState(false);
-  const [showHelpModal, setShowHelpModal] = useState(false);
+  const [showHelpModal, setShowHelpModal] = useState(true);
   const [isMobile, setIsMobile] = useState(false);
   const [mobileView, setMobileView] = useState('chat'); // 'chat' or 'data'
   

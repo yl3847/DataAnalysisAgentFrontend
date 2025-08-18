@@ -30,6 +30,7 @@ const SampleDataDisplay = () => {
   };
 
   const stats = getStatistics();
+  const rowsToDisplay = 5;
 
   return (
     <div className="sample-data-display h-full flex flex-col">
@@ -42,8 +43,11 @@ const SampleDataDisplay = () => {
 
       {/* Data Preview */}
       <div className="mb-6">
-        <h3 className="text-lg font-semibold text-gray-700 mb-3">Data Preview</h3>
-        <DataTable data={sampleData.slice(0, 5)} maxRows={5} />
+        <div className="flex items-center justify-between mb-3">
+          <h3 className="text-lg font-semibold text-gray-700">Data Preview</h3>
+          <span className="text-sm text-gray-500">displaying {rowsToDisplay} of 500 records</span>
+        </div>
+        <DataTable data={sampleData.slice(0, rowsToDisplay)} maxRows={rowsToDisplay} />
       </div>
 
       {/* Statistics */}
