@@ -1,15 +1,15 @@
 {
   "files": {
-    "main.css": "/DataAnalysisAgentFrontend/static/css/main.1b9048ed.css",
-    "main.js": "/DataAnalysisAgentFrontend/static/js/main.9b3ba553.js",
+    "main.css": "/DataAnalysisAgentFrontend/static/css/main.489bed05.css",
+    "main.js": "/DataAnalysisAgentFrontend/static/js/main.357cdcb8.js",
     "static/js/205.3fb35001.chunk.js": "/DataAnalysisAgentFrontend/static/js/205.3fb35001.chunk.js",
     "index.html": "/DataAnalysisAgentFrontend/index.html",
-    "main.1b9048ed.css.map": "/DataAnalysisAgentFrontend/static/css/main.1b9048ed.css.map",
-    "main.9b3ba553.js.map": "/DataAnalysisAgentFrontend/static/js/main.9b3ba553.js.map",
+    "main.489bed05.css.map": "/DataAnalysisAgentFrontend/static/css/main.489bed05.css.map",
+    "main.357cdcb8.js.map": "/DataAnalysisAgentFrontend/static/js/main.357cdcb8.js.map",
     "205.3fb35001.chunk.js.map": "/DataAnalysisAgentFrontend/static/js/205.3fb35001.chunk.js.map"
   },
   "entrypoints": [
-    "static/css/main.1b9048ed.css",
-    "static/js/main.9b3ba553.js"
+    "static/css/main.489bed05.css",
+    "static/js/main.357cdcb8.js"
   ]
 }
