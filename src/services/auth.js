@@ -19,26 +19,49 @@ class AuthService {
 
 
 
-  async signUp(email, password) {
+  async signUp(email, password, username = '', occupation = '') {
     try {
+      const userAttributes = [
+        {
+          Name: 'email',
+          Value: email
+        }
+      ];
+
+      // Add username if provided
+      if (username.trim()) {
+        userAttributes.push({
+          Name: 'custom:username',
+          Value: username.trim()
+        });
+      }
+
+      // Add occupation if provided
+      if (occupation.trim()) {
+        userAttributes.push({
+          Name: 'custom:occupation',
+          Value: occupation.trim()
+        });
+      }
+
       const command = new SignUpCommand({
         ClientId: this.userPoolClientId,
         Username: email,
         Password: password,
-        UserAttributes: [
-          {
-            Name: 'email',
-            Value: email
-          }
-        ]
+        UserAttributes: userAttributes
       });
 
       const response = await this.client.send(command);
       console.log('Sign up successful:', response);
       
-      // With auto-verification enabled, the user should be able to login immediately
       // Store the user info for immediate login
       localStorage.setItem('userEmail', email);
+      if (username.trim()) {
+        localStorage.setItem('userName', username.trim());
+      }
+      if (occupation.trim()) {
+        localStorage.setItem('userOccupation', occupation.trim());
+      }
       
       // Check if the user was auto-confirmed
       if (response.UserConfirmed) {
@@ -138,6 +161,8 @@ class AuthService {
     try {
       localStorage.removeItem('authToken');
       localStorage.removeItem('userEmail');
+      localStorage.removeItem('userName');
+      localStorage.removeItem('userOccupation');
     } catch (error) {
       console.error('Sign out error:', error);
     }
@@ -173,9 +198,16 @@ class AuthService {
   }
 
   async getCurrentUser() {
-    // For simplicity, we'll just return the stored user email
+    // Return the stored user information
     const email = localStorage.getItem('userEmail');
-    return email ? { username: email } : null;
+    const username = localStorage.getItem('userName');
+    const occupation = localStorage.getItem('userOccupation');
+    
+    return email ? { 
+      email,
+      username: username || email.split('@')[0], // Fallback to email prefix if no username
+      occupation: occupation || ''
+    } : null;
   }
 
   async getSession() {
@@ -194,6 +226,14 @@ class AuthService {
 
   getUserEmail() {
     return localStorage.getItem('userEmail');
+  }
+
+  getUserName() {
+    return localStorage.getItem('userName');
+  }
+
+  getUserOccupation() {
+    return localStorage.getItem('userOccupation');
   }
 }
 

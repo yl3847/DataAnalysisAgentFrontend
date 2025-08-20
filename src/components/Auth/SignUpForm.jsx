@@ -4,6 +4,8 @@ import './Auth.css';
 
 const SignUpForm = ({ onSignUpSuccess, onSwitchToLogin, onShowEmailConfirmation, isModal = false }) => {
   const [email, setEmail] = useState('');
+  const [username, setUsername] = useState('');
+  const [occupation, setOccupation] = useState('');
   const [password, setPassword] = useState('');
   const [confirmPassword, setConfirmPassword] = useState('');
   const [isLoading, setIsLoading] = useState(false);
@@ -30,7 +32,7 @@ const SignUpForm = ({ onSignUpSuccess, onSwitchToLogin, onShowEmailConfirmation,
 
     try {
       // Just sign up the user without auto-login
-      await authService.signUp(email, password);
+      await authService.signUp(email, password, username, occupation);
       
       // Always redirect to login after sign-up
       alert('Account created successfully! Please sign in to continue.');
@@ -48,6 +50,18 @@ const SignUpForm = ({ onSignUpSuccess, onSwitchToLogin, onShowEmailConfirmation,
       <div className={isModal ? "" : "auth-card"}>
         {!isModal && <h2>Sign Up</h2>}
         <form onSubmit={handleSubmit} className="auth-form">
+          <div className="form-group">
+            <label htmlFor="username">Username</label>
+            <input
+              type="text"
+              id="username"
+              value={username}
+              onChange={(e) => setUsername(e.target.value)}
+              required
+              placeholder="Enter your username"
+            />
+          </div>
+          
           <div className="form-group">
             <label htmlFor="email">Email</label>
             <input
@@ -84,6 +98,17 @@ const SignUpForm = ({ onSignUpSuccess, onSwitchToLogin, onShowEmailConfirmation,
               onChange={(e) => setConfirmPassword(e.target.value)}
               required
               placeholder="Confirm your password"
+            />
+          </div>
+          
+          <div className="form-group">
+            <label htmlFor="occupation">Occupation (Optional)</label>
+            <input
+              type="text"
+              id="occupation"
+              value={occupation}
+              onChange={(e) => setOccupation(e.target.value)}
+              placeholder="e.g., Data Analyst, Student, Developer"
             />
           </div>
 

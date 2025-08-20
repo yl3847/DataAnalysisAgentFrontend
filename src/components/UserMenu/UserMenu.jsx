@@ -6,10 +6,12 @@ const UserMenu = ({ onClose, onLogout, isAuthenticated = true, onAuthRequest = n
   const [activeTab, setActiveTab] = useState('profile');
   
   const userEmail = authService.getUserEmail();
+  const userName = authService.getUserName();
+  const userOccupation = authService.getUserOccupation();
   const user = {
-    name: userEmail ? userEmail.split('@')[0] : 'User',
+    name: userName || (userEmail ? userEmail.split('@')[0] : 'User'),
     email: userEmail || 'user@example.com',
-    role: 'Data Analyst',
+    role: userOccupation || 'Data Analyst',
     joinDate: 'January 2024'
   };
 
