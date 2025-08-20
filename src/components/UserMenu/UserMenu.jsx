@@ -1,12 +1,14 @@
 import React, { useState } from 'react';
+import authService from '../../services/auth';
 import './UserMenu.css';
 
-const UserMenu = ({ onClose }) => {
+const UserMenu = ({ onClose, onLogout }) => {
   const [activeTab, setActiveTab] = useState('profile');
   
+  const userEmail = authService.getUserEmail();
   const user = {
-    name: 'John Doe',
-    email: 'john.doe@example.com',
+    name: userEmail ? userEmail.split('@')[0] : 'User',
+    email: userEmail || 'user@example.com',
     role: 'Data Analyst',
     joinDate: 'January 2024'
   };
@@ -107,8 +109,11 @@ const UserMenu = ({ onClose }) => {
           >
             Close
           </button>
-          <button className="px-4 py-2 bg-blue-600 text-white rounded-lg hover:bg-blue-700 transition-colors">
-            Save Changes
+          <button 
+            onClick={onLogout}
+            className="px-4 py-2 bg-red-600 text-white rounded-lg hover:bg-red-700 transition-colors"
+          >
+            Logout
           </button>
         </div>
       </div>

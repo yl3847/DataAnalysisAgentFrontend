@@ -6,10 +6,12 @@ import ChatPanel from './components/ChatPanel/ChatPanel';
 import UserMenu from './components/UserMenu/UserMenu';
 import HelpModal from './components/HelpModal/HelpModal';
 import ResizeHandle from './components/ResizeHandle/ResizeHandle';
+import Auth from './components/Auth/Auth';
 import { useLocalStorage } from './hooks/useLocalStorage';
 import { useAnalysis } from './hooks/useAnalysis';
 import { usePanelResize } from './hooks/usePanelResize';
 import { initGA, trackPageView, trackUserOrigin, trackEvent } from './utils/analytics';
+import authService from './services/auth';
 
 function App() {
   const [messages, setMessages] = useLocalStorage('chat-messages', []);
@@ -20,11 +22,30 @@ function App() {
   const [showHelpModal, setShowHelpModal] = useState(false);
   const [isMobile, setIsMobile] = useState(false);
   const [mobileView, setMobileView] = useState('chat'); // 'chat' or 'data'
+  const [isAuthenticated, setIsAuthenticated] = useState(false);
+  const [isLoadingAuth, setIsLoadingAuth] = useState(true);
   
   const analysisRefs = useRef({});
   const messageRefs = useRef({});
   const containerRef = useRef(null);
   
+  // Check authentication status on app load
+  useEffect(() => {
+    const checkAuthStatus = async () => {
+      try {
+        const isAuth = authService.isAuthenticated();
+        setIsAuthenticated(isAuth);
+      } catch (error) {
+        console.error('Auth check error:', error);
+        setIsAuthenticated(false);
+      } finally {
+        setIsLoadingAuth(false);
+      }
+    };
+
+    checkAuthStatus();
+  }, []);
+
   // Check if device is mobile
   useEffect(() => {
     const checkMobile = () => {
@@ -92,6 +113,37 @@ function App() {
     selectedModel
   });
 
+  const handleAuthSuccess = () => {
+    setIsAuthenticated(true);
+  };
+
+  const handleLogout = async () => {
+    try {
+      await authService.signOut();
+      setIsAuthenticated(false);
+    } catch (error) {
+      console.error('Logout error:', error);
+      setIsAuthenticated(false);
+    }
+  };
+
+  // Show loading screen while checking authentication
+  if (isLoadingAuth) {
+    return (
+      <div className="App min-h-screen bg-white flex items-center justify-center">
+        <div className="text-center">
+          <div className="animate-spin rounded-full h-12 w-12 border-b-2 border-blue-500 mx-auto mb-4"></div>
+          <p className="text-gray-600">Loading...</p>
+        </div>
+      </div>
+    );
+  }
+
+  // Show authentication screen if not authenticated
+  if (!isAuthenticated) {
+    return <Auth onAuthSuccess={handleAuthSuccess} />;
+  }
+
   // Mobile layout
   if (isMobile) {
     return (
@@ -158,7 +210,10 @@ function App() {
         </MainLayout>
         
         {showUserMenu && (
-          <UserMenu onClose={() => setShowUserMenu(false)} />
+          <UserMenu 
+            onClose={() => setShowUserMenu(false)} 
+            onLogout={handleLogout}
+          />
         )}
         
         {showHelpModal && (
@@ -220,7 +275,10 @@ function App() {
       </MainLayout>
       
       {showUserMenu && (
-        <UserMenu onClose={() => setShowUserMenu(false)} />
+        <UserMenu 
+          onClose={() => setShowUserMenu(false)} 
+          onLogout={handleLogout}
+        />
       )}
       
       {showHelpModal && (
