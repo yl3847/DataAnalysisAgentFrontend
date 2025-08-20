@@ -6,6 +6,7 @@
   "copyright": "© 2025 DSAgent. All rights reserved.",
   "dependencies": {
     "@ant-design/charts": "^2.0.0",
+    "@aws-sdk/client-cognito-identity-provider": "^3.0.0",
     "@testing-library/jest-dom": "^5.17.0",
     "@testing-library/react": "^13.4.0",
     "@testing-library/user-event": "^13.5.0",
