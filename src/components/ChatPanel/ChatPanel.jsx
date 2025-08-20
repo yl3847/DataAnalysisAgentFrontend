@@ -12,7 +12,9 @@ const ChatPanel = ({
   onSendMessage,
   onMessageClick,
   onDeleteMessage,
-  onClearAll
+  onClearAll,
+  isAuthenticated = true,
+  onAuthRequest = null
 }) => {
   return (
     <div 
@@ -30,6 +32,8 @@ const ChatPanel = ({
         selectedModel={selectedModel}
         onModelChange={onModelChange}
         onClearAll={onClearAll}
+        isAuthenticated={isAuthenticated}
+        onAuthRequest={onAuthRequest}
       />
     </div>
   );

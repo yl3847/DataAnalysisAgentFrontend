@@ -13,7 +13,9 @@ const ChatBox = ({
   onDeleteMessage,
   selectedModel,
   onModelChange,
-  onClearAll
+  onClearAll,
+  isAuthenticated = true,
+  onAuthRequest = null
 }) => {
   const messagesContainerRef = useRef(null);
   const messagesEndRef = useRef(null);
@@ -59,12 +61,14 @@ const ChatBox = ({
         <h2 className="text-lg font-semibold text-gray-800">
           Analytics Chat
         </h2>
-        <button
-          onClick={onClearAll}
-          className="text-sm px-3 py-1 text-gray-500 hover:text-gray-700 hover:bg-gray-100 rounded-lg transition-colors"
-        >
-          Clear All
-        </button>
+        {isAuthenticated && (
+          <button
+            onClick={onClearAll}
+            className="text-sm px-3 py-1 text-gray-500 hover:text-gray-700 hover:bg-gray-100 rounded-lg transition-colors"
+          >
+            Clear All
+          </button>
+        )}
       </div>
 
 
@@ -78,48 +82,81 @@ const ChatBox = ({
           minHeight: 0 
         }}
       >
-        {messages.length === 0 ? (
+        {messages.length === 0 || !isAuthenticated ? (
           <div className="flex flex-col justify-center h-full py-8">
             <div className="max-w-full">
-              <div className="text-center mb-6">
-                <div className="inline-flex items-center justify-center w-16 h-16 bg-gradient-to-br from-blue-500 to-purple-600 rounded-full mb-4">
-                  <svg className="w-8 h-8 text-white" fill="none" viewBox="0 0 24 24" stroke="currentColor">
-                    <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} 
-                      d="M8 10h.01M12 10h.01M16 10h.01M9 16H5a2 2 0 01-2-2V6a2 2 0 012-2h14a2 2 0 012 2v8a2 2 0 01-2 2h-4l-4 4z" />
-                  </svg>
-                </div>
-                <h3 className="text-lg font-semibold text-gray-800 mb-2">
-                  Start Your Analysis
-                </h3>
-                <p className="text-sm text-gray-500">
-                  Choose a prompt below or type your own query
-                </p>
-              </div>
-
-              {/* Sample Prompts */}
-              <div className="space-y-4 max-w-full px-2">
-                {samplePrompts.map((category, idx) => (
-                  <div key={idx}>
-                    <div className="flex items-center mb-2">
-                      <span className="text-lg mr-2">{category.icon}</span>
-                      <span className="text-xs font-semibold text-gray-600 uppercase tracking-wide">
-                        {category.category}
-                      </span>
+              {isAuthenticated ? (
+                // Show normal chat interface for authenticated users
+                <>
+                  <div className="text-center mb-6">
+                    <div className="inline-flex items-center justify-center w-16 h-16 bg-gradient-to-br from-blue-500 to-purple-600 rounded-full mb-4">
+                      <svg className="w-8 h-8 text-white" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                        <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} 
+                          d="M8 10h.01M12 10h.01M16 10h.01M9 16H5a2 2 0 01-2-2V6a2 2 0 012-2h14a2 2 0 012 2v8a2 2 0 01-2 2h-4l-4 4z" />
+                      </svg>
                     </div>
-                    <div className="space-y-1">
-                      {category.prompts.map((prompt, pidx) => (
-                        <button
-                          key={pidx}
-                          onClick={() => onSendMessage(prompt)}
-                          className="w-full text-left px-3 py-2 text-xs bg-gradient-to-r from-gray-50 to-gray-100 hover:from-blue-50 hover:to-purple-50 rounded-lg transition-all duration-200 text-gray-700 hover:text-gray-900 hover:shadow-sm"
-                        >
-                          {prompt}
-                        </button>
-                      ))}
-                    </div>
+                    <h3 className="text-lg font-semibold text-gray-800 mb-2">
+                      Start Your Analysis
+                    </h3>
+                    <p className="text-sm text-gray-500">
+                      Choose a prompt below or type your own query
+                    </p>
                   </div>
-                ))}
-              </div>
+
+                  {/* Sample Prompts */}
+                  <div className="space-y-4 max-w-full px-2">
+                    {samplePrompts.map((category, idx) => (
+                      <div key={idx}>
+                        <div className="flex items-center mb-2">
+                          <span className="text-lg mr-2">{category.icon}</span>
+                          <span className="text-xs font-semibold text-gray-600 uppercase tracking-wide">
+                            {category.category}
+                          </span>
+                        </div>
+                        <div className="space-y-1">
+                          {category.prompts.map((prompt, pidx) => (
+                            <button
+                              key={pidx}
+                              onClick={() => onSendMessage(prompt)}
+                              className="w-full text-left px-3 py-2 text-xs bg-gradient-to-r from-gray-50 to-gray-100 hover:from-blue-50 hover:to-purple-50 rounded-lg transition-all duration-200 text-gray-700 hover:text-gray-900 hover:shadow-sm"
+                            >
+                              {prompt}
+                            </button>
+                          ))}
+                        </div>
+                      </div>
+                    ))}
+                  </div>
+                </>
+              ) : (
+                // Show sign-in prompt for unauthenticated users
+                <div className="text-center">
+                  <div className="inline-flex items-center justify-center w-16 h-16 bg-gradient-to-br from-gray-400 to-gray-500 rounded-full mb-4">
+                    <svg className="w-8 h-8 text-white" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                      <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M12 15v2m-6 4h12a2 2 0 002-2v-6a2 2 0 00-2-2H6a2 2 0 00-2 2v6a2 2 0 002 2zm10-10V7a4 4 0 00-8 0v4h8z" />
+                    </svg>
+                  </div>
+                  <h3 className="text-lg font-semibold text-gray-800 mb-2">
+                    Sign in to Use Chatbot
+                  </h3>
+                  <p className="text-sm text-gray-500 mb-6">
+                    Please sign in or create an account to start chatting with the AI assistant
+                  </p>
+                  
+                                     {/* Sign in/Sign up buttons */}
+                   <div className="space-y-3 max-w-xs mx-auto">
+                     <button
+                       onClick={() => onAuthRequest && onAuthRequest()}
+                       className="w-full px-4 py-2 bg-blue-600 text-white rounded-lg hover:bg-blue-700 transition-colors text-sm font-medium"
+                     >
+                       Sign In / Sign Up
+                     </button>
+                     <p className="text-xs text-gray-400">
+                       You can explore the data panel while you're here
+                     </p>
+                   </div>
+                </div>
+              )}
             </div>
           </div>
         ) : (
@@ -168,6 +205,7 @@ const ChatBox = ({
           onSendMessage={onSendMessage} 
           disabled={isLoading}
           compact={true}
+          isAuthenticated={isAuthenticated}
         />
       </div>
     </div>

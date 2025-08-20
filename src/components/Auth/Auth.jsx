@@ -4,7 +4,7 @@ import SignUpForm from './SignUpForm';
 import EmailConfirmation from './EmailConfirmation';
 import './Auth.css';
 
-const Auth = ({ onAuthSuccess }) => {
+const Auth = ({ onAuthSuccess, isModal = false }) => {
   const [isLogin, setIsLogin] = useState(true);
   const [showEmailConfirmation, setShowEmailConfirmation] = useState(false);
   const [pendingEmail, setPendingEmail] = useState('');
@@ -14,8 +14,8 @@ const Auth = ({ onAuthSuccess }) => {
   };
 
   const handleSignUpSuccess = () => {
-    // With auto-verification, user is already logged in after sign-up
-    onAuthSuccess(); // Redirect to main app immediately
+    // After sign-up, switch to login form instead of redirecting to main app
+    setIsLogin(true);
   };
 
   const handleShowEmailConfirmation = (email) => {
@@ -46,7 +46,7 @@ const Auth = ({ onAuthSuccess }) => {
   };
 
   return (
-    <div className="auth-wrapper">
+    <div className={isModal ? "auth-wrapper-modal" : "auth-wrapper"}>
       {showEmailConfirmation ? (
         <EmailConfirmation
           email={pendingEmail}
@@ -57,12 +57,14 @@ const Auth = ({ onAuthSuccess }) => {
         <LoginForm 
           onLoginSuccess={handleLoginSuccess}
           onSwitchToSignUp={switchToSignUp}
+          isModal={isModal}
         />
       ) : (
         <SignUpForm 
           onSignUpSuccess={handleSignUpSuccess}
           onSwitchToLogin={switchToLogin}
           onShowEmailConfirmation={handleShowEmailConfirmation}
+          isModal={isModal}
         />
       )}
     </div>

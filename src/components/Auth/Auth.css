@@ -1,3 +1,7 @@
+.auth-wrapper-modal {
+  /* No background or centering needed when in modal */
+}
+
 .auth-container {
   display: flex;
   justify-content: center;

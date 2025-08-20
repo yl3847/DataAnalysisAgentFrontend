@@ -10,7 +10,8 @@ const DataPanel = ({
   analysisRefs,
   highlightedAnalysis,
   onAnalysisClick,
-  onDeleteAnalysis
+  onDeleteAnalysis,
+  hideNavigation = false
 }) => {
   return (
     <div 
@@ -18,40 +19,58 @@ const DataPanel = ({
       style={{ width: `${width}%` }}
     >
       <div className="bg-white rounded-lg shadow-lg h-full flex flex-col overflow-hidden">
-        {/* Tab Navigation */}
-        <div className="border-b px-3 sm:px-6 py-3 flex-shrink-0" style={{ height: '60px' }}>
-          <div className="flex items-center justify-between h-full">
-            <div className="flex space-x-1">
-              <button
-                onClick={() => setActiveView('data')}
-                className={`px-2 sm:px-4 py-2 text-xs sm:text-sm font-medium rounded-lg transition-all ${
-                  activeView === 'data'
-                    ? 'bg-gradient-to-r from-blue-500 to-blue-600 text-white shadow-sm'
-                    : 'text-gray-600 hover:text-gray-800 hover:bg-gray-100'
-                }`}
-              >
-                <span className="hidden sm:inline">Sample Data Overview</span>
-                <span className="sm:hidden">Data</span>
-              </button>
-              <button
-                onClick={() => setActiveView('analysis')}
-                className={`px-2 sm:px-4 py-2 text-xs sm:text-sm font-medium rounded-lg transition-all ${
-                  activeView === 'analysis'
-                    ? 'bg-gradient-to-r from-blue-500 to-blue-600 text-white shadow-sm'
-                    : 'text-gray-600 hover:text-gray-800 hover:bg-gray-100'
-                }`}
-              >
-                <span className="hidden sm:inline">Analysis Results</span>
-                <span className="sm:hidden">Analysis</span>
-                {analysisHistory.length > 0 && (
-                  <span className="ml-1 sm:ml-2 px-1 sm:px-2 py-0.5 text-xs bg-white bg-opacity-20 rounded-full">
-                    {analysisHistory.length}
-                  </span>
-                )}
-              </button>
+        {/* Tab Navigation - Hide in mobile mode when hideNavigation is true */}
+        {!hideNavigation && (
+          <div className="border-b px-3 sm:px-6 py-3 flex-shrink-0" style={{ height: '60px' }}>
+            <div className="flex items-center justify-between h-full">
+              <div className="flex space-x-1">
+                <button
+                  onClick={() => setActiveView('data')}
+                  className={`px-2 sm:px-4 py-2 text-xs sm:text-sm font-medium rounded-lg transition-all ${
+                    activeView === 'data'
+                      ? 'bg-gradient-to-r from-blue-500 to-blue-600 text-white shadow-sm'
+                      : 'text-gray-600 hover:text-gray-800 hover:bg-gray-100'
+                  }`}
+                >
+                  <span className="hidden sm:inline">Sample Data Overview</span>
+                  <span className="sm:hidden">Data</span>
+                </button>
+                <button
+                  onClick={() => setActiveView('analysis')}
+                  className={`px-2 sm:px-4 py-2 text-xs sm:text-sm font-medium rounded-lg transition-all ${
+                    activeView === 'analysis'
+                      ? 'bg-gradient-to-r from-blue-500 to-blue-600 text-white shadow-sm'
+                      : 'text-gray-600 hover:text-gray-800 hover:bg-gray-100'
+                  }`}
+                >
+                  <span className="hidden sm:inline">Analysis Results</span>
+                  <span className="sm:hidden">Analysis</span>
+                  {analysisHistory.length > 0 && (
+                    <span className="ml-1 sm:ml-2 px-1 sm:px-2 py-0.5 text-xs bg-white bg-opacity-20 rounded-full">
+                      {analysisHistory.length}
+                    </span>
+                  )}
+                </button>
+              </div>
             </div>
           </div>
-        </div>
+        )}
+        
+        {/* Mobile Header for specific view when navigation is hidden */}
+        {hideNavigation && (
+          <div className="border-b px-3 py-3 flex-shrink-0" style={{ height: '60px' }}>
+            <div className="flex items-center h-full">
+              <h2 className="text-lg font-semibold text-gray-800">
+                {activeView === 'data' ? 'Sample Data Overview' : 'Analysis Results'}
+              </h2>
+              {activeView === 'analysis' && analysisHistory.length > 0 && (
+                <span className="ml-2 px-2 py-1 text-xs bg-blue-100 text-blue-600 rounded-full">
+                  {analysisHistory.length} result{analysisHistory.length !== 1 ? 's' : ''}
+                </span>
+              )}
+            </div>
+          </div>
+        )}
 
         {/* Content Area */}
         <div className="flex-1 overflow-y-auto p-3 sm:p-6 analysis-scroll-area">

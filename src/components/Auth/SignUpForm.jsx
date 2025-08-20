@@ -2,7 +2,7 @@ import React, { useState } from 'react';
 import authService from '../../services/auth';
 import './Auth.css';
 
-const SignUpForm = ({ onSignUpSuccess, onSwitchToLogin, onShowEmailConfirmation }) => {
+const SignUpForm = ({ onSignUpSuccess, onSwitchToLogin, onShowEmailConfirmation, isModal = false }) => {
   const [email, setEmail] = useState('');
   const [password, setPassword] = useState('');
   const [confirmPassword, setConfirmPassword] = useState('');
@@ -29,18 +29,12 @@ const SignUpForm = ({ onSignUpSuccess, onSwitchToLogin, onShowEmailConfirmation 
     }
 
     try {
-      // Use the new signUpAndSignIn method for immediate login
-      const result = await authService.signUpAndSignIn(email, password);
+      // Just sign up the user without auto-login
+      await authService.signUp(email, password);
       
-      if (result.userConfirmed) {
-        // User was auto-confirmed and signed in successfully
-        alert('Account created and logged in successfully!');
-        onSignUpSuccess(); // This should redirect to the main app
-      } else {
-        // Fallback: user needs manual confirmation (shouldn't happen with auto-verification)
-        alert('Account created successfully! Please check your email for confirmation.');
-        onSwitchToLogin();
-      }
+      // Always redirect to login after sign-up
+      alert('Account created successfully! Please sign in to continue.');
+      onSwitchToLogin();
     } catch (error) {
       console.error('Sign up error:', error);
       setError(error.message || 'Sign up failed. Please try again.');
@@ -50,9 +44,9 @@ const SignUpForm = ({ onSignUpSuccess, onSwitchToLogin, onShowEmailConfirmation 
   };
 
   return (
-    <div className="auth-container">
-      <div className="auth-card">
-        <h2>Sign Up</h2>
+    <div className={isModal ? "" : "auth-container"}>
+      <div className={isModal ? "" : "auth-card"}>
+        {!isModal && <h2>Sign Up</h2>}
         <form onSubmit={handleSubmit} className="auth-form">
           <div className="form-group">
             <label htmlFor="email">Email</label>

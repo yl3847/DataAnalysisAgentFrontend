@@ -2,7 +2,7 @@ import React, { useState } from 'react';
 import authService from '../../services/auth';
 import './Auth.css';
 
-const LoginForm = ({ onLoginSuccess, onSwitchToSignUp }) => {
+const LoginForm = ({ onLoginSuccess, onSwitchToSignUp, isModal = false }) => {
   const [email, setEmail] = useState('');
   const [password, setPassword] = useState('');
   const [isLoading, setIsLoading] = useState(false);
@@ -25,9 +25,9 @@ const LoginForm = ({ onLoginSuccess, onSwitchToSignUp }) => {
   };
 
   return (
-    <div className="auth-container">
-      <div className="auth-card">
-        <h2>Login</h2>
+    <div className={isModal ? "" : "auth-container"}>
+      <div className={isModal ? "" : "auth-card"}>
+        {!isModal && <h2>Login</h2>}
         <form onSubmit={handleSubmit} className="auth-form">
           <div className="form-group">
             <label htmlFor="email">Email</label>
