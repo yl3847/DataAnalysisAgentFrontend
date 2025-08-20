@@ -1,13 +1,15 @@
 {
   "files": {
-    "main.css": "/DataAnalysisAgentFrontend/static/css/main.cca93d5b.css",
-    "main.js": "/DataAnalysisAgentFrontend/static/js/main.da54a5af.js",
+    "main.css": "/DataAnalysisAgentFrontend/static/css/main.1b9048ed.css",
+    "main.js": "/DataAnalysisAgentFrontend/static/js/main.9b3ba553.js",
+    "static/js/205.3fb35001.chunk.js": "/DataAnalysisAgentFrontend/static/js/205.3fb35001.chunk.js",
     "index.html": "/DataAnalysisAgentFrontend/index.html",
-    "main.cca93d5b.css.map": "/DataAnalysisAgentFrontend/static/css/main.cca93d5b.css.map",
-    "main.da54a5af.js.map": "/DataAnalysisAgentFrontend/static/js/main.da54a5af.js.map"
+    "main.1b9048ed.css.map": "/DataAnalysisAgentFrontend/static/css/main.1b9048ed.css.map",
+    "main.9b3ba553.js.map": "/DataAnalysisAgentFrontend/static/js/main.9b3ba553.js.map",
+    "205.3fb35001.chunk.js.map": "/DataAnalysisAgentFrontend/static/js/205.3fb35001.chunk.js.map"
   },
   "entrypoints": [
-    "static/css/main.cca93d5b.css",
-    "static/js/main.da54a5af.js"
+    "static/css/main.1b9048ed.css",
+    "static/js/main.9b3ba553.js"
   ]
 }
