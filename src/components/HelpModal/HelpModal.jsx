@@ -27,7 +27,7 @@ const HelpModal = ({ onClose }) => {
                     <span className="text-blue-600 text-sm font-semibold">1</span>
                   </div>
                   <div>
-                    <p className="text-sm text-gray-700">Ask questions about your data in the chat interface on the right panel.</p>
+                    <p className="text-sm text-gray-700">Ask questions about the sample data in the chat interface on the right panel.</p>
                   </div>
                 </div>
                 <div className="flex items-start space-x-3">
@@ -35,7 +35,7 @@ const HelpModal = ({ onClose }) => {
                     <span className="text-blue-600 text-sm font-semibold">2</span>
                   </div>
                   <div>
-                    <p className="text-sm text-gray-700">Use the sample prompts to get started quickly with common analysis tasks.</p>
+                    <p className="text-sm text-gray-700">Try the sample prompts to get started quickly with common analysis tasks.</p>
                   </div>
                 </div>
                 <div className="flex items-start space-x-3">

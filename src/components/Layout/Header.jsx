@@ -57,8 +57,9 @@ const Header = ({ onUserMenuClick, onHelpClick }) => {
           <div className="flex items-center space-x-2 sm:space-x-4 relative">
             <button
               onClick={onUserMenuClick}
-              className="p-2 rounded-lg hover:bg-gray-100 transition-colors"
+              className="p-2 rounded-lg hover:bg-gray-100 transition-colors disabled:opacity-50 disabled:cursor-not-allowed disabled:hover:bg-transparent"
               title="User Settings"
+              disabled
             >
               <svg
                 className="h-5 w-5 sm:h-6 sm:w-6 text-gray-600"
